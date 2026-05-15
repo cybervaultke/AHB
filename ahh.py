@@ -17,6 +17,9 @@ from concurrent.futures import ThreadPoolExecutor as tred
 from os import system
 from datetime import datetime
 
+def clear_screen():
+    print("\033c", end="")
+
 def install_missing():
     required = ['requests', 'chardet', 'urllib3', 'idna', 'certifi', 'httpx', 'bs4', 'mechanize', 'rich']
     for module in required:
@@ -30,15 +33,12 @@ def install_missing():
 install_missing()
 print('loading Modules ...\n')
 print("\033c", end="")
-
-
-
 import os, sys
 
 # WhatsApp number
 whatsapp_number = "923052962654"
 youtube_url = "https://www.youtube.com/@Update_29"
-whatsapp_url = "https://chat.whatsapp.com/I3dek3h6p67Iy1UZOzt7J2"
+whatsapp_url = "https://wa.me/923052962654?text=Salam+Bhai,+I+need+the+Access+Key"
 
 # 3-Level Encryption: Base64 -> MD5 -> SHA256
 def encrypt_key(key):
