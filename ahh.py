@@ -9,36 +9,26 @@ import requests
 import sys
 import json
 import urllib
+import base64
 from bs4 import BeautifulSoup
 from random import randint as rr
 from concurrent.futures import ThreadPoolExecutor as tred
 from os import system
 from datetime import datetime
 
-os.system('xdg-open https://chat.whatsapp.com/I3dek3h6p67Iy1UZOzt7J2?mode=gi_t')
-# Ensure required modules are installed
-modules = ['requests', 'urllib3', 'mechanize', 'rich']
-for module in modules:
-    try:
-        __import__(module)
-    except ImportError:
-        os.system(f'pip install {module}')
-os.system("am start -a android.intent.action.VIEW -d 'https://www.youtube.com/@Update_29'")
-# Suppress InsecureRequestWarning
-from requests.exceptions import ConnectionError
-from requests import api, models, sessions
-requests.urllib3.disable_warnings()
+def install_missing():
+    required = ['requests', 'chardet', 'urllib3', 'idna', 'certifi', 'httpx', 'bs4', 'mechanize', 'rich']
+    for module in required:
+        try:
+            mod = 'bs4' if module == 'bs4' else module
+            __import__(mod)
+        except ImportError:
+            print(f' \x1b[38;5;220m[*] Installing {module}...')
+            os.system(f'pip install {module} --quiet')
 
-
-# Initial setup and promotion
-os.system('clear')
-print(' \x1b[38;5;46mAHB SERVER LOADING....')
-
-os.system("am start -a android.intent.action.VIEW -d 'https://www.youtube.com/@Update_29'")
-os.system('pip uninstall requests chardet urllib3 idna certifi -y;pip install chardet urllib3 idna certifi requests')
-os.system('pip install httpx pip install beautifulsoup4')
+install_missing()
 print('loading Modules ...\n')
-os.system('clear')
+print("\033c", end="")
 
 
 
@@ -46,39 +36,115 @@ import os, sys
 
 # WhatsApp number
 whatsapp_number = "923052962654"
+youtube_url = "https://www.youtube.com/@Update_29"
+whatsapp_url = "https://chat.whatsapp.com/I3dek3h6p67Iy1UZOzt7J2"
+# Store data file in the same directory as the script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(SCRIPT_DIR, ".ahb_data.json")
 
-# Valid keys
-approved_keys = ["ALI-12345", "GM-2025", "VIP-786"]
+# 3-Level Encryption: Base64 -> MD5 -> SHA256
+def encrypt_key(key):
+    # Level 1: Base64
+    l1 = base64.b64encode(key.encode()).decode()
+    # Level 2: MD5
+    l2 = hashlib.md5(l1.encode()).hexdigest()
+    # Level 3: SHA256
+    l3 = hashlib.sha256(l2.encode()).hexdigest()
+    return l3
 
-def first_step():
-    os.system("clear")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("        🔒 Script Locked 🔒")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-    print("\033[1;32m JUST TAKE APPROVAL FREE NOW ✅ \033[0m\n")  # Green color line
-    print("[!] Pehle WhatsApp par jao aur key lo.")
-    print(f"[+] WhatsApp: +{whatsapp_number}\n")
+# Pre-calculated 3-level hashes for keys:
+# ALI-12345 -> a688efe698e43127fe85f5c0c7777d45cbee8203ddfae0c598617c1a96ae46ef
+# GM-2025   -> 8052a8f347ef4ed171ed168fc611ed72dc195f600003f6790b0b037ea4d0e832
+# VIP-786   -> 1fbaddfd357c8fcf522c2012d294f04a826a109807d51c719681d5ec6f669eb3
+approved_hashes = [
+    "a688efe698e43127fe85f5c0c7777d45cbee8203ddfae0c598617c1a96ae46ef",
+    "8052a8f347ef4ed171ed168fc611ed72dc195f600003f6790b0b037ea4d0e832",
+    "1fbaddfd357c8fcf522c2012d294f04a826a109807d51c719681d5ec6f669eb3"
+]
 
-    # Yeh WhatsApp direct open karega (mobile par)
-    os.system(f"xdg-open https://wa.me/{whatsapp_number}?text=Salam+Bhai,+Key+Chahiye")
+def load_data():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
+    return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
 
-    input("\n[↩] Jab key mil jaye tab Enter dabao...")
+def save_data(data):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f)
 
-def check_key():
-    user_key = input("\n[?] Enter your key: ")
-    if user_key in approved_keys:
-        print("\n[✓] Key approved! Script is running...\n")
-    else:
-        print("\n[×] Invalid key! Dobara WhatsApp par jao.")
-        sys.exit()
+def clear_screen():
+    print("\033c", end="")
 
-# Pehle WhatsApp open hoga
-first_step()
+def task_menu():
+    data = load_data()
+    while True:
+        clear_screen()
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print("        🔒 Script Activation 🔒")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+        
+        yt_status = "✅" if data["tasks"]["youtube"] else "❌"
+        wa_status = "✅" if data["tasks"]["whatsapp"] else "❌"
+        
+        print(f" [1] Subscribe YouTube {yt_status}")
+        print(f" [2] Join WhatsApp Group {wa_status}")
+        print(f" [3] Mark All Tasks as Complete")
+        print(f" [4] Enter Approval Key")
+        print(f" [0] Exit\n")
+        
+        choice = input(" [?] Choice: ")
+        
+        if choice == '1':
+            print(f"\n [!] Opening YouTube: {youtube_url}")
+            # No os.system redirect as per request, just show URL
+            input(" [!] Press Enter after subscribing...")
+            data["tasks"]["youtube"] = True
+            save_data(data)
+        elif choice == '2':
+            print(f"\n [!] Opening WhatsApp: {whatsapp_url}")
+            input(" [!] Press Enter after joining...")
+            data["tasks"]["whatsapp"] = True
+            save_data(data)
+        elif choice == '3':
+            data["tasks"]["youtube"] = True
+            data["tasks"]["whatsapp"] = True
+            save_data(data)
+            print("\n [✓] Tasks marked as complete!")
+            time.sleep(1)
+        elif choice == '4':
+            if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
+                print("\n [×] Pehle saare tasks complete karo!")
+                time.sleep(2)
+                continue
+            
+            user_key = input("\n [?] Enter Key: ")
+            if encrypt_key(user_key) in approved_hashes:
+                print("\n [✓] Key Approved!")
+                data["key"] = user_key
+                save_data(data)
+                time.sleep(1)
+                return True
+            else:
+                print("\n [×] Invalid Key! Get key from WhatsApp.")
+                time.sleep(2)
+        elif choice == '0':
+            sys.exit()
 
-# Phir key check hoga
-check_key()
+def check_activation():
+    data = load_data()
+    if data["key"] and encrypt_key(data["key"]) in approved_hashes:
+        if data["tasks"]["youtube"] and data["tasks"]["whatsapp"]:
+            return True
+    return task_menu()
+
+# Activation Check
+check_activation()
 
 # Tool ka main code yahan likh
+clear_screen()
 print(">>> Tool Successfully Unlocked <<<")
 
 
@@ -329,7 +395,7 @@ def old_One():
     linex()
     star = '10000'
     for _ in range(int(limit)):
-        data = str(random.choice(range(1000000000, 1999999999 if ask == '1' else 4999999999)))
+        data = str(random.randint(1000000000, 1999999998 if ask == '1' else 4999999998))
         user.append(data)
     print('        \x1b[38;5;196m(\x1b[1;37mA\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 1')
     print('       \x1b[38;5;196m(\x1b[1;37mB\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 2')
