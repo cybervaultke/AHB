@@ -39,9 +39,6 @@ import os, sys
 whatsapp_number = "923052962654"
 youtube_url = "https://www.youtube.com/@Update_29"
 whatsapp_url = "https://chat.whatsapp.com/I3dek3h6p67Iy1UZOzt7J2"
-# Store data file in the same directory as the script
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_FILE = os.path.join(SCRIPT_DIR, ".ahb_data.json")
 
 # 3-Level Encryption: Base64 -> MD5 -> SHA256
 def encrypt_key(key):
@@ -63,83 +60,23 @@ approved_hashes = [
     "1fbaddfd357c8fcf522c2012d294f04a826a109807d51c719681d5ec6f669eb3"
 ]
 
-def load_data():
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, 'r') as f:
-                return json.load(f)
-        except:
-            return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
-    return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
-
-def save_data(data):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f)
-
 def clear_screen():
     print("\033c", end="")
 
-def task_menu():
-    data = load_data()
-    while True:
-        clear_screen()
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print("        🔒 Script Activation 🔒")
-        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-        
-        yt_status = "✅" if data["tasks"]["youtube"] else "❌"
-        wa_status = "✅" if data["tasks"]["whatsapp"] else "❌"
-        
-        print(f" [1] Subscribe YouTube {yt_status}")
-        print(f" [2] Join WhatsApp Group {wa_status}")
-        print(f" [3] Mark All Tasks as Complete")
-        print(f" [4] Enter Approval Key")
-        print(f" [0] Exit\n")
-        
-        choice = input(" [?] Choice: ")
-        
-        if choice == '1':
-            print(f"\n [!] Opening YouTube: {youtube_url}")
-            # No os.system redirect as per request, just show URL
-            input(" [!] Press Enter after subscribing...")
-            data["tasks"]["youtube"] = True
-            save_data(data)
-        elif choice == '2':
-            print(f"\n [!] Opening WhatsApp: {whatsapp_url}")
-            input(" [!] Press Enter after joining...")
-            data["tasks"]["whatsapp"] = True
-            save_data(data)
-        elif choice == '3':
-            data["tasks"]["youtube"] = True
-            data["tasks"]["whatsapp"] = True
-            save_data(data)
-            print("\n [✓] Tasks marked as complete!")
-            time.sleep(1)
-        elif choice == '4':
-            if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
-                print("\n [×] Pehle saare tasks complete karo!")
-                time.sleep(2)
-                continue
-            
-            user_key = input("\n [?] Enter Key: ")
-            if encrypt_key(user_key) in approved_hashes:
-                print("\n [✓] Key Approved!")
-                data["key"] = user_key
-                save_data(data)
-                time.sleep(1)
-                return True
-            else:
-                print("\n [×] Invalid Key! Get key from WhatsApp.")
-                time.sleep(2)
-        elif choice == '0':
-            sys.exit()
-
 def check_activation():
-    data = load_data()
-    if data["key"] and encrypt_key(data["key"]) in approved_hashes:
-        if data["tasks"]["youtube"] and data["tasks"]["whatsapp"]:
-            return True
-    return task_menu()
+    clear_screen()
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print("        🔒 Access Required 🔒")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+    # Force key entry every time
+    user_key = input(" [?] Enter Approval Key: ")
+    if encrypt_key(user_key) in approved_hashes:
+        print("\n [✓] Key Approved!")
+        time.sleep(1)
+        return True
+    else:
+        print("\n [×] Invalid Key! Exiting.")
+        sys.exit(0)
 
 # Activation Check
 check_activation()
@@ -619,4 +556,11 @@ def check_for_updates():
 
 if __name__ == '__main__':
     check_for_updates()
-    BNG_71_()
+    check_activation()
+    while True:
+        try:
+            BNG_71_()
+            break
+        except KeyboardInterrupt:
+            print("\n\n[!] Returning to main menu...")
+            continue
