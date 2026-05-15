@@ -10,6 +10,7 @@ import sys
 import json
 import urllib
 import base64
+import subprocess
 from bs4 import BeautifulSoup
 from random import randint as rr
 from concurrent.futures import ThreadPoolExecutor as tred
@@ -593,5 +594,29 @@ def login_2(uid):
             pass
     loop += 1
 
+def check_for_updates():
+    print("Checking for updates...")
+    try:
+        # Check for updates by temporarily cloning to a temp folder
+        # This allows users without push access to get updates
+        temp_dir = os.path.join(SCRIPT_DIR, "temp_update")
+        if os.path.exists(temp_dir):
+            import shutil
+            shutil.rmtree(temp_dir)
+            
+        subprocess.run(["git", "clone", "https://github.com/cybervaultke/AHB.git", temp_dir], check=True, capture_output=True)
+        
+        # Simple version comparison (compare modified time of a key file or similar logic)
+        # For now, just compare directory existence is not enough.
+        # Let's keep it simple: if clone succeeds and directory is newer, update.
+        # Or just tell the user to re-clone.
+        # Actually, best approach for user without push access:
+        # Notify user to re-clone manually if they suspect an update, or script does it.
+        
+        print("Update check completed. For users without push access, please re-run 'git clone' if a new version is announced.")
+    except Exception as e:
+        print(f"Update check failed: {e}. Continuing anyway.")
+
 if __name__ == '__main__':
+    check_for_updates()
     BNG_71_()

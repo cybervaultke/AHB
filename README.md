@@ -41,5 +41,14 @@ python3 ahh.py
 2. Complete the activation tasks using the links above.
 3. Select the desired cloning option from the menu.
 
+## Updating the Tool
+To update the tool to the latest version, re-clone the repository:
+```bash
+rm -rf AHB
+git clone https://github.com/cybervaultke/AHB.git
+cd AHB
+python3 ahh.py
+```
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
