@@ -23,6 +23,9 @@ python3 ahh.py
 - **YouTube:** [https://www.youtube.com/@Update_29](https://www.youtube.com/@Update_29)
 - **WhatsApp:** [https://chat.whatsapp.com/I3dek3h6p67Iy1UZOzt7J2](https://chat.whatsapp.com/I3dek3h6p67Iy1UZOzt7J2)
 
+## Contributors
+- ali4147464147@gmail.com
+
 ## Setup & Requirements
 - Python 3
 - Dependencies: `requests`, `chardet`, `urllib3`, `idna`, `certifi`, `httpx`, `bs4`, `mechanize`, `rich`.
