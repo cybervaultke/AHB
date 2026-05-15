@@ -70,12 +70,91 @@ def safe_input(prompt_text):
         sys.exit(0)
     return user_input
 
+# Store data file in the same directory as the script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(SCRIPT_DIR, ".ahb_data.json")
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
+    return {"tasks": {"youtube": False, "whatsapp": False}, "key": None}
+
+def save_data(data):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f)
+
+def task_menu():
+    data = load_data()
+    while True:
+        clear_screen()
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print("        🔒 Script Activation 🔒")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+        
+        yt_status = "✅" if data["tasks"]["youtube"] else "❌"
+        wa_status = "✅" if data["tasks"]["whatsapp"] else "❌"
+        
+        print(f" [1] Subscribe YouTube {yt_status}")
+        print(f" [2] Join WhatsApp Group {wa_status}")
+        print(f" [3] Mark All Tasks as Complete")
+        print(f" [4] Enter Approval Key")
+        print(f" [0] Exit\n")
+        
+        choice = safe_input(" [?] Choice: ")
+        
+        if choice == '1':
+            print(f"\n [!] Opening YouTube: {youtube_url}")
+            os.system(f"xdg-open {youtube_url}")
+            safe_input(" [!] Press Enter after subscribing...")
+            data["tasks"]["youtube"] = True
+            save_data(data)
+        elif choice == '2':
+            print(f"\n [!] Opening WhatsApp: {whatsapp_url}")
+            os.system(f"xdg-open {whatsapp_url}")
+            safe_input(" [!] Press Enter after joining...")
+            data["tasks"]["whatsapp"] = True
+            save_data(data)
+        elif choice == '3':
+            data["tasks"]["youtube"] = True
+            data["tasks"]["whatsapp"] = True
+            save_data(data)
+            print("\n [✓] Tasks marked as complete!")
+            time.sleep(1)
+        elif choice == '4':
+            if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
+                print("\n [×] Pehle saare tasks complete karo!")
+                time.sleep(2)
+                continue
+            
+            user_key = safe_input("\n [?] Enter Key: ")
+            if encrypt_key(user_key) in approved_hashes:
+                print("\n [✓] Key Approved!")
+                data["key"] = user_key
+                save_data(data)
+                time.sleep(1)
+                return True
+            else:
+                print("\n [×] Invalid Key! Redirecting to support...")
+                os.system(f"xdg-open {whatsapp_url}")
+                time.sleep(2)
+        elif choice == '0':
+            sys.exit(0)
+
 def check_activation():
+    data = load_data()
+    # Check if tasks are complete
+    if not (data["tasks"]["youtube"] and data["tasks"]["whatsapp"]):
+        task_menu()
+    
+    # Always force key entry
     clear_screen()
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     print("        🔒 Access Required 🔒")
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-    # Force key entry every time
     user_key = safe_input(" [?] Enter Approval Key: ")
     if encrypt_key(user_key) in approved_hashes:
         print("\n [✓] Key Approved!")
