@@ -2,6 +2,8 @@
 
 A tool for brute-forcing/cloning old Facebook accounts based on UIDs.
 
+---
+
 ## ⚠️ Disclaimer
 This tool is for educational purposes only. Unauthorized use of this tool against systems you do not own or have explicit permission to test is illegal and unethical. Use at your own risk.
 
@@ -38,3 +40,6 @@ python3 ahh.py
    ```
 2. Complete the activation tasks using the links above.
 3. Select the desired cloning option from the menu.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
