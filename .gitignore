@@ -1,5 +1,15 @@
+# Data and Secrets
+serviceAccountKey.json
+.ahb_data.json
+.ahh_data.json
+
+# Ignore the gitignore itself (per your request)
+.gitignore
+
+# Python
 __pycache__/
 *.py[cod]
-.env
+*$py.class
+
+# OS
 .DS_Store
-.ahb_data.json
