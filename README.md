@@ -1,30 +1,37 @@
 # WEB TOOL 👑
 
-A professional-grade, high-speed Facebook account cloning agent featuring a modern "Ant-style" UI and optimized multi-threaded performance.
+**WEB TOOL** is a high-performance, professional-grade security research agent designed for high-speed multi-threaded account testing. Built with a focus on efficiency, stability, and a premium user experience, it features a unique "WEB TOOL signature style" command-line interface optimized for both mobile (Termux) and desktop environments.
 
 ---
 
 ## ⚠️ Disclaimer
-**Educational Purposes Only.** Unauthorized use of this tool against systems you do not own or have explicit permission to test is illegal and unethical. The developer is not responsible for any misuse of this software. Use at your own risk.
+**FOR RESEARCH PURPOSES ONLY.** WEB TOOL is intended solely for educational and ethical security research. Unauthorized use of this tool against systems or accounts you do not own is strictly prohibited. The developer assumes no liability for misuse or damage caused by this software.
 
 ---
 
-## ✨ Features
-- **Premium "Ant" UI:** Full-screen width frames with integrated titles, section-based layouts, and centered ASCII art optimized for mobile (Termux) and desktop.
-- **Fast Cracking:** Highly optimized multi-threading (up to 30 workers) for maximum speed.
-- **Dual Login Methods:** 
-  - **Method A:** Advanced Graph API based (Fast & Efficient).
-  - **Method B:** Stable Legacy API based (Reliable).
-- **Smart Logic:** Automatic creation year estimation based on UID series.
-- **Thread-Safe UI:** Synchronized real-time progress updates with timestamps and success tracking.
-- **Premium Activation:** Integrated Firebase-linked security check for authorized access.
-- **Standalone:** Zero external UI dependencies – works perfectly on any Python 3 environment.
+## ✨ Core Features
+
+### 🚀 High-Speed Multi-Threading
+Utilizes an optimized thread pool with up to 30 concurrent workers, ensuring the fastest possible execution without compromising system stability.
+
+### 🛡️ HWID Security Locking
+Features a robust Hardware ID (HWID) registration system. Every premium key is cryptographically bound to a single device upon first login, preventing unauthorized key sharing and ensuring fair usage.
+
+### 🖥️ Premium WEB TOOL Interface
+A cutting-edge UI featuring:
+- **Full-Screen Width Frames:** Dynamic terminal width detection for a perfectly scaled workspace.
+- **Section-Based Navigation:** Organized data layouts with professional dividers.
+- **Integrated Terminal Branding:** Automatically updates your Termux session title to **webt 👑**.
+
+### 🛠️ Advanced Dual Methods
+- **Method A (Graph API):** High-speed, modern API integration for maximum efficiency.
+- **Method B (Legacy API):** A stable, fallback implementation ensuring reliability across different network conditions.
 
 ---
 
 ## 🚀 Installation
 
-Ensure you have Python 3 installed, then run the following commands:
+WEB TOOL is designed to be standalone. Ensure you have **Python 3.x** installed, then run:
 
 ```bash
 git clone https://github.com/cybervaultke/AHB.git
@@ -32,34 +39,27 @@ cd AHB
 python3 ahh.py
 ```
 
-*The script will automatically attempt to install any missing dependencies (requests, bs4, etc.) on its first run.*
+*The tool will automatically detect and install required libraries (requests, bs4, etc.) on its first launch.*
 
 ---
 
-## 🛠️ Usage
+## 🛠️ Getting Started
 
-1. **Launch:** Run the tool using `python3 ahh.py`.
-2. **Tasks:** Complete the mandatory activation tasks (YouTube/WhatsApp) via the interactive menu.
-3. **Login:** Enter your registered Name and Approval Key.
-4. **Clone:** Select your target UID series and preferred method to start the process.
-5. **Results:** All successful hits (`OK`) and checkpoints (`CP`) are automatically saved to `/sdcard/WEBT-OK.txt`.
-
----
-
-## 📁 Project Structure
-- `ahh.py`: The main standalone "WEB TOOL" script.
-- `firebase_client.py`: Handles secure database interactions.
-- `config.py`: Central configuration for branding and API links.
-- `admin.py`: Panel for managing access keys (authorized use only).
+1. **Launch:** Open the tool with `python3 ahh.py`.
+2. **Key Registration:** New users must provide their unique HWID (shown on screen) to the admin for key approval.
+3. **Login:** Enter your registered Name and Approval Key to authorize your session.
+4. **Operation:** Select your target series and cracking method from the secure menu.
+5. **Auto-Save:** Successful results are automatically logged to `/sdcard/WEBT-OK.txt`.
 
 ---
 
-## 📞 Contact & Support
+## 👤 Ownership & Support
 
-For keys, support, or feedback, contact **Ali Khan**:
+Developed and Maintained by **Ali Khan**.
+
 - **GitHub:** [@cybervaultke](https://github.com/cybervaultke)
-- **WhatsApp:** [https://wa.me/923052962654](https://wa.me/923052962654)
-- **YouTube:** [@cybervaultke](https://www.youtube.com/@cybervaultke)
+- **Support:** [WhatsApp Support](https://wa.me/923052962654)
+- **Channel:** [YouTube Profile](https://www.youtube.com/@cybervaultke)
 
 ---
 

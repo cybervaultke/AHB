@@ -18,3 +18,13 @@ class FirebaseClient:
         url = f"{self.base_url}/{path.strip('/')}.json"
         response = requests.put(url, json=data)
         return response.ok
+
+    def set_data(self, path, data):
+        """Alias for put_data to maintain compatibility."""
+        return self.put_data(path, data)
+
+    def update_data(self, path, data):
+        """Performs a PATCH request to update specific fields without overwriting."""
+        url = f"{self.base_url}/{path.strip('/')}.json"
+        response = requests.patch(url, json=data)
+        return response.ok
