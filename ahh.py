@@ -174,25 +174,23 @@ def header():
     set_session_title("webt 👑")
     width = get_terminal_width()
     
+    # Stable ASCII Art (using simple characters)
     art = [
-        "██╗    ██╗███████╗██████╗     ████████╗ ██████╗  ██████╗ ██╗",
-        "██║    ██║██╔════╝██╔══██╗    ╚══██╔══╝██╔═══██╗██╔═══██╗██║",
-        "██║ █╗ ██║█████╗  ██████╔╝       ██║   ██║   ██║██║   ██║██║",
-        "██║███╗██║██╔══╝  ██╔══██╗       ██║   ██║   ██║██║   ██║██║",
-        "╚███╔███╔╝███████╗██████╔╝       ██║   ╚██████╔╝╚██████╔╝███████╗",
-        " ╚══╝╚══╝ ╚══════╝╚═════╝        ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝"
+        " __      __  ____  ____  _____   _____  ____   ____  __    ",
+        "  \\ \\    / / | ___||  _ \\|_   _| |_   _||  _ \\ / __ \\|  |   ",
+        "   \\ \\/\\/ /  | _|  | _ _/  | |     | |  | | | | |  | |  |   ",
+        "    \\_/\\_/   |____||_| \\_\\ |_|     |_|  |_| |_|\\____/|____| ",
+        "                                                          "
     ]
     
-    content = ""
-    for line in art: content += console.center_text(line, width-4) + "\n"
-    content += "\n" + console.center_text("[bold cyan]WEB TOOL 👑[/bold cyan]", width-4) + "\n"
-    content += console.center_text("[dim]Professional Cloning Agent[/dim]", width-4) + "\n"
+    # Title/Version/Description
+    console.print("\n".join([console.center_text(line, width) for line in art]))
+    console.print(console.center_text("[bold cyan]WEB TOOL 👑[/bold cyan]", width))
+    console.print(console.center_text("[dim]a professional terminal cloning agent[/dim]", width) + "\n")
     
-    content += "--- session\n"
-    content += f" ▎ [bold cyan]hwid[/bold cyan]     [white]{get_hwid()}[/white]\n"
-    content += " ▎ [bold cyan]mode[/bold cyan]     [white]Premium[/white]\n"
-    content += " ▎ [bold cyan]owner[/bold cyan]    [white]Ali Khan[/white]"
-    show_panel(content, title="WEB TOOL 👑", subtitle="v5.6.0", footer="cybervaultke · Ali Khan")
+    # Session Details
+    session_info = f"--- session\n ▎ [bold cyan]hwid[/bold cyan]     [white]{get_hwid()}[/white]\n ▎ [bold cyan]mode[/bold cyan]     [white]Premium[/white]\n ▎ [bold cyan]owner[/bold cyan]    [white]Ali Khan[/white]"
+    show_panel(session_info, title="WEB TOOL 👑", subtitle="v5.6.0", footer="cybervaultke · Ali Khan")
 
 def about_us():
     header()

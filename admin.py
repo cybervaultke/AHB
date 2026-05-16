@@ -78,7 +78,7 @@ db = FirebaseClient()
 def admin_header():
     os.system('clear')
     width = get_terminal_width()
-    # 6-line ADMIN block art
+    # Ant-style 6-line block art for ADMIN
     art = [
         " █████╗ ██████╗ ███╗   ███╗██╗███╗   ██╗",
         "██╔══██╗██╔══██╗████╗ ████║██║████╗  ██║",
@@ -87,10 +87,10 @@ def admin_header():
         "██║  ██║██████╔╝██║ ╚═╝ ██║██║██║ ╚████║",
         "╚═╝  ╚═╝╚═════╝ ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝"
     ]
-    content = ""
-    for line in art: content += console.center_text(line, width-4) + "\n"
-    content += "\n" + console.center_text("[bold yellow]WEB TOOL ADMIN PANEL[/bold yellow]", width-4) + "\n"
-    show_panel(content, title="ADMIN ACCESS", style="yellow")
+    
+    console.print("\n".join([console.center_text(line, width) for line in art]))
+    console.print("\n" + console.center_text("[bold yellow]WEB TOOL ADMIN PANEL[/bold yellow]", width) + "\n")
+    linex()
 
 def add_key():
     admin_header()
