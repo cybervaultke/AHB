@@ -229,11 +229,12 @@ def main_menu_entry():
         elif choice == '2': about_us()
         elif choice == '0': sys.exit(0)
         elif choice == '3':
-            msg = f"Salam Ali Khan, I want to get the approval key for WEB TOOL 👑. My HWID is: {hwid}"
+            msg = f"Salam Ali Khan, I want to get the approval key for WEB TOOL 👑. My HWID is: {get_hwid()}"
             url = f"https://wa.me/923052962654?text={msg.replace(' ', '+')}"
             header()
-            show_panel(f"[bold cyan]CONTACT ADMIN[/bold cyan]\n\n{url}", title="GET KEY")
-            safe_input(" Press Enter to return...")
+            show_panel(f"[bold cyan]CONTACT ADMIN[/bold cyan]\n\n[dim]{url}[/dim]\n\n[bold yellow]Press Enter to open in WhatsApp...[/bold yellow]", title="GET KEY")
+            input()
+            os.system(f"xdg-open '{url}'")
 
 def check_activation():
     data = load_data()
@@ -406,7 +407,7 @@ def old_clone_menu():
         if choice == '1': cloning_process("ALL", "10000")
         elif choice == '2': cloning_process("100003/4", ["100003", "100004"])
         elif choice == '3': cloning_process("2009", "1000004")
-        elif choice == '0': break
+        elif choice == '0': sys.exit(0)
         else: show_error("Invalid option")
 
 def cloning_process(name, prefixes):
