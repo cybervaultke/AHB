@@ -1,6 +1,4 @@
 import os
-from rich.console import Console
-console = Console()
 import re
 import time
 import uuid
@@ -11,41 +9,6 @@ import requests
 import sys
 import json
 import urllib
-# get_hwid function defined below (removed circular import)
-
-# Path to HWID cache file
-CACHE_FILE = '/data/data/com.termux/files/home/AHB/.hwid_cache'
-
-def get_hwid():
-    """Return a hardware identifier string, cached across runs.
-    Checks for a cached HWID in `.hwid_cache`; if absent, generates one using
-    `uuid.getnode()` and stores it for future executions.
-    """
-    # Try to read cached HWID
-    try:
-        if os.path.exists(CACHE_FILE):
-            with open(CACHE_FILE, 'r') as f:
-                cached = f.read().strip()
-                if cached:
-                    return cached
-    except Exception:
-        pass
-    # Generate new HWID
-    try:
-        mac = uuid.getnode()
-        hwid = f"{mac:012x}"
-    except Exception:
-        hwid = "unknown_hwid"
-    # Save to cache
-    try:
-        with open(CACHE_FILE, 'w') as f:
-            f.write(hwid)
-    except Exception:
-        pass
-    return hwid
-# Auto-generate and cache HWID on first import
-_ = get_hwid()
-
 from bs4 import BeautifulSoup
 from random import randint as rr
 from concurrent.futures import ThreadPoolExecutor as tred
@@ -191,10 +154,10 @@ def window1():
 
 
 # Set window title
-sys.stdout.write('\x1b]2;𓆩【A H B 👑 】𓆪 \x07')
+sys.stdout.write('\x1b]2;𓆩【A H B 👑ALI  】𓆪 \x07')
 
 
-    # AHB Clover Logo - Green - Version 2.5
+    # AHB Clover Logo - Green - Version 3.5
 def ____banner____():
     if 'win' in sys.platform:
         os.system('cls')
@@ -330,8 +293,7 @@ def old_One():
     linex()
     star = '10000'
     for _ in range(int(limit)):
-        # Use randint for large ranges to avoid overflow
-        data = str(random.randint(1000000000, 1999999999 if ask == '1' else 4999999999))
+        data = str(random.choice(range(1000000000, 1999999999 if ask == '1' else 4999999999)))
         user.append(data)
     print('        \x1b[38;5;196m(\x1b[1;37mA\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 1')
     print('       \x1b[38;5;196m(\x1b[1;37mB\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 2')
@@ -529,88 +491,5 @@ def login_2(uid):
             pass
     loop += 1
 
-def new_main():
-    from firebase_client import FirebaseClient
-    from admin import show_success, show_error
-    firebase = FirebaseClient()
-    global console
-    # Pre‑login menu (mirrors ahh)
-    def header():
-        console.print("\n [bold yellow]WELCOME\n")
-    def safe_input(prompt):
-        return input(prompt)
-    def about_us():
-        console.print("About us placeholder")
-    def main_menu_entry():
-        while True:
-            header()
-            hwid = get_hwid()
-            console.print("\n [bold yellow]WELCOME\n")
-            linex()
-            console.print(" ◆ [bold yellow]01[/bold yellow]  Login / Start Tool")
-            console.print(" ◆ [bold yellow]02[/bold yellow]  About Us / Contact")
-            console.print(" ◆ [bold yellow]03[/bold yellow]  Get Approval Key")
-            console.print(" ◆ [bold yellow]00[/bold yellow]  Exit Tool")
-            linex()
-            choice = safe_input("\n [?] Selection: ")
-            if choice in ('1', '01'):
-                return True
-            elif choice in ('2', '02'):
-                about_us()
-            elif choice in ('0', '00'):
-                sys.exit(0)
-            elif choice in ('3', '03'):
-                # Open WhatsApp with predefined message
-                message = "Hello, I need an activation key for AHB tool."
-                # Encode spaces and special characters for URL
-                import urllib.parse
-                encoded_msg = urllib.parse.quote(message)
-                wa_url = f"https://wa.me/1234567890?text={encoded_msg}"
-                os.system(f"am start -a android.intent.action.VIEW -d '{wa_url}'")
-    def check_activation():
-        key = safe_input('Enter activation key: ').strip()
-        if not key:
-            show_error('Invalid key')
-            return False
-        # Verify key in Firebase
-        key_data = firebase.get_data(f'keys/{key}')
-        if not key_data:
-            show_error('Key not found')
-            return False
-        # Check expiry
-        expiry = key_data.get('expiry')
-        if expiry:
-            from datetime import datetime
-            try:
-                exp_date = datetime.strptime(expiry, "%Y-%m-%d")
-                if exp_date < datetime.now():
-                    show_error('Key expired')
-                    return False
-            except Exception:
-                pass
-        # Verify HWID matches stored value
-        stored_hwid = key_data.get('hwid')
-        current_hwid = get_hwid()
-        if stored_hwid:
-            if stored_hwid != current_hwid:
-                show_error('HWID mismatch')
-                return False
-        else:
-            # No HWID recorded yet, bind current HWID to the key and inform user
-            firebase.update_data(f'keys/{key}', {'hwid': current_hwid})
-            show_success('HWID bound to key')
-        show_success('Activation successful')
-        return True
-    if not main_menu_entry():
-        return
-    if not check_activation():
-        return
-    # After auth, run original cloning UI loop
-    while True:
-        BNG_71_()
-        cont = safe_input(" Press Enter to return to menu or type /exit to quit: ")
-        if cont.strip().lower() == '/exit':
-            break
-
 if __name__ == '__main__':
-    new_main()
+    BNG_71_()
