@@ -596,8 +596,9 @@ def new_main():
                 show_error('HWID mismatch')
                 return False
         else:
-            # No HWID recorded yet, bind current HWID to the key
+            # No HWID recorded yet, bind current HWID to the key and inform user
             firebase.update_data(f'keys/{key}', {'hwid': current_hwid})
+            show_success('HWID bound to key')
         show_success('Activation successful')
         return True
     if not main_menu_entry():
