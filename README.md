@@ -36,11 +36,10 @@
 For both first-time installations and updates, ensure you have a clean slate by removing any existing folder before cloning.
 
 ```bash
-# Clean up and Install
 rm -rf AHB
 git clone https://github.com/cybervaultke/AHB.git
 cd AHB
-python3 ahh.py
+bash run_ahh.sh password
 ```
 
 > **Note:** The tool will automatically detect and install required libraries (`requests`, `bs4`, etc.) on its first launch.
@@ -49,9 +48,16 @@ python3 ahh.py
 
 ## 🛠️ Getting Started
 
-1.  **Launch:** Execute `python3 ahh.py`.
-2.  **Register:** Provide your unique HWID to the admin for key approval.
-3.  **Login:** Enter your registered Name and Approval Key.
+1.  **Launch:** Execute `python3 ahh.py`
+
+> **Note:** The tool will automatically install required Python libraries (`requests`, `beautifulsoup4`, etc.) on first run. If automatic installation fails, you can manually install them:
+> ```bash
+> pip install -r requirements.txt
+> ```
+> or simply:
+> ```bash
+> pip install requests beautifulsoup4
+> ```.
 4.  **Operate:** Select your target series and cracking method.
 5.  **Save:** Successful results are automatically logged to `/sdcard/WEBT-OK.txt`.
 
