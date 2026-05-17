@@ -11,7 +11,21 @@ import requests
 import sys
 import json
 import urllib
-from ahh import get_hwid
+# get_hwid function defined below (removed circular import)
+
+def get_hwid():
+    """Return a hardware identifier string.
+    Uses UUID based on the MAC address as a simple HWID.
+    """
+    try:
+        # uuid.getnode() returns the hardware address as a 48‑bit integer.
+        mac = uuid.getnode()
+        # Format as hexadecimal string without the "0x" prefix.
+        return f"{mac:012x}"
+    except Exception:
+        # Fallback to a random identifier if MAC cannot be obtained.
+        return "unknown_hwid"
+
 from bs4 import BeautifulSoup
 from random import randint as rr
 from concurrent.futures import ThreadPoolExecutor as tred
