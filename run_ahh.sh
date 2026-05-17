@@ -20,12 +20,14 @@ DECRYPT_STATUS=$?
 if [[ $DECRYPT_STATUS -ne 0 ]]; then
   echo "Decryption failed"
   # Open WhatsApp to request password (replace with appropriate link)
-  termux-open "https://wa.me/1234567890?text=Please%20provide%20the%20decryption%20password"
+  termux-open "https://wa.me/+923052962654?text=Please%20provide%20the%20decryption%20password"
   exit 1
 fi
 
 # Execute the decrypted script
 python3 "$TMP_PY"
+# Success message
+echo "AHB tool launched successfully!"
 
 # Clean up
 rm -f "$TMP_PY"
