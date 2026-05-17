@@ -242,7 +242,7 @@ def header():
     console.print(console.center_text("[bold green]AHB/MODEL 👑[/bold green]", width))
     console.print(console.center_text("[dim]a professional terminal cloning agent[/dim]", width) + "\n")
     
-    # Session Details
+    # Session Details - FIXED: Complete string
     session_info = f"--- session\n ▎ [bold green]hwid[/bold green]     [white]{get_hwid()}[/white]\n ▎ [bold green]mode[/bold green]     [white]Premium[/white]\n ▎ [bold green]owner[/bold green]    [white]Ali Khan[/white]"
     show_panel(session_info, title="AHB/MODEL 👑", subtitle="v5.6.0", footer="cybervaultke · Ali Khan")
 
@@ -396,7 +396,7 @@ def creationyear(uid):
     return ''
 
 def login_1(uid):
-    global loop
+    global loop, oks, cps
     session = requests.session()
     try:
         with console.lock:
@@ -442,10 +442,11 @@ def login_1(uid):
                     pass
                 cps.append(uid); break
         loop += 1
-    except: pass
+    except Exception as e:
+        console.log(f"[bold red]ERROR in login_1: {str(e)}[/bold red]")
 
 def login_2(uid):
-    global loop
+    global loop, oks, cps
     try:
         with console.lock:
             ts = datetime.now().strftime('%H:%M:%S')
@@ -483,7 +484,8 @@ def login_2(uid):
                         pass
                     cps.append(uid); break
         loop += 1
-    except: pass
+    except Exception as e:
+        console.log(f"[bold red]ERROR in login_2: {str(e)}[/bold red]")
 
 def old_clone_menu():
     while True:
@@ -505,8 +507,13 @@ def old_clone_menu():
         else: show_error("Invalid option")
 
 def cloning_process(name, prefixes):
-    global stop_cloning, oks, cps
+    global stop_cloning, oks, cps, loop, user
     stop_cloning = False
+    oks = []
+    cps = []
+    loop = 0
+    user = []
+    
     header()
     console.print("\n [bold yellow]CLONING SETUP[/bold yellow]")
     linex()
@@ -521,7 +528,14 @@ def cloning_process(name, prefixes):
     console.print(f" ◆ [bold yellow]A[/bold yellow]  Method 1            {'Graph API (Fast)':>20}")
     console.print(f" ◆ [bold yellow]B[/bold yellow]  Method 2            {'Legacy API (Stable)':>20}")
     linex()
-    meth = safe_input(" [?] Selection (A/B) : ").upper()
+    meth = safe_input(" [?] Selection (A/B) : ").strip().upper()
+    
+    # VALIDATE METHOD INPUT
+    if meth not in ('A', 'B'):
+        show_error("Invalid method selection! Please choose A or B.")
+        time.sleep(2)
+        return
+    
     user = []
     for _ in range(lim):
         if isinstance(prefixes, list): uid = random.choice(prefixes) + ''.join(random.choices('0123456789', k=9))
@@ -535,10 +549,15 @@ def cloning_process(name, prefixes):
     pool = tred(max_workers=30)
     try:
         for uid in user:
-            if meth == 'A': pool.submit(login_1, uid)
-            else: pool.submit(login_2, uid)
+            if meth == 'A': 
+                pool.submit(login_1, uid)
+            else: 
+                pool.submit(login_2, uid)
         pool.shutdown(wait=True)
     except KeyboardInterrupt:
+        pool.shutdown(wait=False)
+    except Exception as e:
+        console.log(f"[bold red]ERROR: {str(e)}[/bold red]")
         pool.shutdown(wait=False)
     
     # Save progress
