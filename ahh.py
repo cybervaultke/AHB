@@ -13,18 +13,38 @@ import json
 import urllib
 # get_hwid function defined below (removed circular import)
 
+# Path to HWID cache file
+CACHE_FILE = '/data/data/com.termux/files/home/AHB/.hwid_cache'
+
 def get_hwid():
-    """Return a hardware identifier string.
-    Uses UUID based on the MAC address as a simple HWID.
+    """Return a hardware identifier string, cached across runs.
+    Checks for a cached HWID in `.hwid_cache`; if absent, generates one using
+    `uuid.getnode()` and stores it for future executions.
     """
+    # Try to read cached HWID
     try:
-        # uuid.getnode() returns the hardware address as a 48‑bit integer.
-        mac = uuid.getnode()
-        # Format as hexadecimal string without the "0x" prefix.
-        return f"{mac:012x}"
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, 'r') as f:
+                cached = f.read().strip()
+                if cached:
+                    return cached
     except Exception:
-        # Fallback to a random identifier if MAC cannot be obtained.
-        return "unknown_hwid"
+        pass
+    # Generate new HWID
+    try:
+        mac = uuid.getnode()
+        hwid = f"{mac:012x}"
+    except Exception:
+        hwid = "unknown_hwid"
+    # Save to cache
+    try:
+        with open(CACHE_FILE, 'w') as f:
+            f.write(hwid)
+    except Exception:
+        pass
+    return hwid
+# Auto-generate and cache HWID on first import
+_ = get_hwid()
 
 from bs4 import BeautifulSoup
 from random import randint as rr
@@ -310,7 +330,8 @@ def old_One():
     linex()
     star = '10000'
     for _ in range(int(limit)):
-        data = str(random.choice(range(1000000000, 1999999999 if ask == '1' else 4999999999)))
+        # Use randint for large ranges to avoid overflow
+        data = str(random.randint(1000000000, 1999999999 if ask == '1' else 4999999999))
         user.append(data)
     print('        \x1b[38;5;196m(\x1b[1;37mA\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 1')
     print('       \x1b[38;5;196m(\x1b[1;37mB\x1b[38;5;196m)\x1b[1;37m>\x1b[38;5;196m×\x1b[1;37m<\x1b[38;5;46mMETHOD 2')
@@ -509,6 +530,9 @@ def login_2(uid):
     loop += 1
 
 def new_main():
+    from firebase_client import FirebaseClient
+    from admin import show_success, show_error
+    firebase = FirebaseClient()
     global console
     # Pre‑login menu (mirrors ahh)
     def header():
@@ -529,19 +553,52 @@ def new_main():
             console.print(" ◆ [bold yellow]00[/bold yellow]  Exit Tool")
             linex()
             choice = safe_input("\n [?] Selection: ")
-            if choice == '1':
+            if choice in ('1', '01'):
                 return True
-            elif choice == '2':
+            elif choice in ('2', '02'):
                 about_us()
-            elif choice == '0':
+            elif choice in ('0', '00'):
                 sys.exit(0)
-            elif choice == '3':
-                console.print('Key request placeholder')
+            elif choice in ('3', '03'):
+                # Open WhatsApp with predefined message
+                message = "Hello, I need an activation key for AHB tool."
+                # Encode spaces and special characters for URL
+                import urllib.parse
+                encoded_msg = urllib.parse.quote(message)
+                wa_url = f"https://wa.me/1234567890?text={encoded_msg}"
+                os.system(f"am start -a android.intent.action.VIEW -d '{wa_url}'")
     def check_activation():
-        key = safe_input('Enter activation key: ')
-        if not key.strip():
+        key = safe_input('Enter activation key: ').strip()
+        if not key:
             show_error('Invalid key')
             return False
+        # Verify key in Firebase
+        key_data = firebase.get_data(f'keys/{key}')
+        if not key_data:
+            show_error('Key not found')
+            return False
+        # Check expiry
+        expiry = key_data.get('expiry')
+        if expiry:
+            from datetime import datetime
+            try:
+                exp_date = datetime.strptime(expiry, "%Y-%m-%d")
+                if exp_date < datetime.now():
+                    show_error('Key expired')
+                    return False
+            except Exception:
+                pass
+        # Verify HWID matches stored value
+        stored_hwid = key_data.get('hwid')
+        current_hwid = get_hwid()
+        if stored_hwid:
+            if stored_hwid != current_hwid:
+                show_error('HWID mismatch')
+                return False
+        else:
+            # No HWID recorded yet, bind current HWID to the key
+            firebase.update_data(f'keys/{key}', {'hwid': current_hwid})
+        show_success('Activation successful')
         return True
     if not main_menu_entry():
         return
