@@ -1,4 +1,0 @@
-# Ignore everything except ahh.enc and run_ahh.sh
-*
-!ahh.enc
-!run_ahh.sh
